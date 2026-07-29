@@ -34,7 +34,7 @@ jobs:
   simulator:
     name: iOS Simulator
     if: github.event_name != 'workflow_dispatch' || inputs.build_type == 'simulator'
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 45
 
     steps:
@@ -60,8 +60,8 @@ jobs:
           global-json-file: Code/ATekWebCommon/ServerApplicationMobile/global.json
           workloads: maui-ios
 
-      - name: Select Xcode 26.3
-        run: sudo xcode-select --switch /Applications/Xcode_26.3.app/Contents/Developer
+      - name: Select Xcode 26.6
+        run: sudo xcode-select --switch /Applications/Xcode_26.6.app/Contents/Developer
 
       - name: Show build environment
         run: |
@@ -110,7 +110,7 @@ jobs:
   signed-ipa:
     name: Signed iOS IPA
     if: github.event_name == 'workflow_dispatch' && inputs.build_type == 'signed-ipa'
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 60
 
     steps:
@@ -134,8 +134,8 @@ jobs:
           global-json-file: Code/ATekWebCommon/ServerApplicationMobile/global.json
           workloads: maui-ios
 
-      - name: Select Xcode 26.3
-        run: sudo xcode-select --switch /Applications/Xcode_26.3.app/Contents/Developer
+      - name: Select Xcode 26.6
+        run: sudo xcode-select --switch /Applications/Xcode_26.6.app/Contents/Developer
 
       - name: Validate signing secrets
         shell: bash
