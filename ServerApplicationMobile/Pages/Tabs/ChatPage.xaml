@@ -135,39 +135,43 @@
                                 EmptyView="No messages in this chat yet.">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="local:ChatMessageItem">
-                            <Frame Margin="0,3"
-                                   Padding="10,7"
-                                   HorizontalOptions="Start"
-                                   MaximumWidthRequest="340"
-                                   CornerRadius="10"
-                                   HasShadow="False"
-                                   BorderColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
-                                   BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
-                                <Frame.Triggers>
-                                    <DataTrigger TargetType="Frame"
-                                                 Binding="{Binding IsSentByCurrentUser}"
-                                                 Value="True">
-                                        <Setter Property="HorizontalOptions" Value="End" />
-                                    </DataTrigger>
-                                </Frame.Triggers>
-                                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto" ColumnSpacing="8">
-                                    <Label Text="{Binding SenderName}"
-                                           FontSize="11"
-                                           FontAttributes="Bold"
-                                           TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
-                                    <Label Grid.Column="1"
-                                           Text="{Binding MessageTime, StringFormat='{0:t}'}"
-                                           FontSize="10"
-                                           TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
-                                    <Label Grid.Row="1"
-                                           Grid.ColumnSpan="2"
-                                           Text="{Binding Message}"
-                                           MaximumWidthRequest="300"
-                                           LineBreakMode="CharacterWrap"
-                                           HorizontalOptions="Start"
-                                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
-                                </Grid>
-                            </Frame>
+                            <Grid ColumnDefinitions="*,4*,*" HorizontalOptions="Fill">
+                                <Frame Grid.ColumnSpan="2"
+                                       Margin="0,3"
+                                       Padding="10,7"
+                                       HorizontalOptions="Start"
+                                       MaximumWidthRequest="340"
+                                       CornerRadius="10"
+                                       HasShadow="False"
+                                       BorderColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
+                                       BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
+                                    <Frame.Triggers>
+                                        <DataTrigger TargetType="Frame"
+                                                     Binding="{Binding IsSentByCurrentUser}"
+                                                     Value="True">
+                                            <Setter Property="Grid.Column" Value="1" />
+                                            <Setter Property="HorizontalOptions" Value="End" />
+                                        </DataTrigger>
+                                    </Frame.Triggers>
+                                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                        <Label Text="{Binding SenderName}"
+                                               FontSize="11"
+                                               FontAttributes="Bold"
+                                               LineBreakMode="TailTruncation"
+                                               TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                        <Label Grid.Column="1"
+                                               Text="{Binding MessageTime, StringFormat='{0:t}'}"
+                                               FontSize="10"
+                                               TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                                        <Label Grid.Row="1"
+                                               Grid.ColumnSpan="2"
+                                               Text="{Binding Message}"
+                                               LineBreakMode="CharacterWrap"
+                                               HorizontalOptions="Fill"
+                                               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                                    </Grid>
+                                </Frame>
+                            </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
