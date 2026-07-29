@@ -138,8 +138,15 @@ public sealed class ChatService : INotifyPropertyChanged
 
                 communicationObject.Faulted += OnChannelUnavailable;
                 communicationObject.Closed += OnChannelUnavailable;
+#if !IOS
                 communicationObject.Open();
+#endif
 
+                // ClientBase<T> creates its inner channel lazily. On iOS the
+                // AOT-safe concrete proxy must use that implicit first-call path;
+                // explicitly opening the outer DuplexClientBase first opens its
+                // factory too early and ChannelBase then tries to finish configuring
+                // an already-open DuplexChannelFactory.
                 var handshake = channel.FirstCall(GenerateToken());
                 if (!string.Equals(handshake, "ATek_S_Ok", StringComparison.Ordinal))
                     throw new SecurityTokenException("The chat server rejected the authentication token.");

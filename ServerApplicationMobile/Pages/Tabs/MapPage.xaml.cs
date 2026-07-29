@@ -18,6 +18,8 @@ public partial class MapPage : ContentPage
     private readonly AuthenticationService _authenticationService;
     private readonly Dictionary<Pin, LocatedCustomerGroup> _pinGroups = new();
     private readonly List<LocatedCustomerGroup> _locatedGroups = new();
+    private readonly HashSet<string> _renderedLocationAddresses =
+        new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, LocatedCustomerGroup> _newLocatedGroups =
         new(StringComparer.OrdinalIgnoreCase);
     private Task _loadTask;
@@ -25,7 +27,6 @@ public partial class MapPage : ContentPage
     private int _totalLocationCount;
     private int _renderedCustomerCount;
     private int _renderedLocationCount;
-    private string _lastRenderSignature;
     private bool _mapLoaded;
     private bool _locationsLoaded;
 
@@ -147,18 +148,12 @@ public partial class MapPage : ContentPage
     {
         var locations = _locatedGroups
             .Concat(_newLocatedGroups.Values)
+            .Where(group => !_renderedLocationAddresses.Contains(group.Address))
             .OrderBy(group => group.Address, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        var renderSignature = string.Join("|", locations.Select(group => group.Address));
-
-        if (string.Equals(renderSignature, _lastRenderSignature, StringComparison.Ordinal))
+        if (locations.Count == 0)
             return;
-
-        _lastRenderSignature = renderSignature;
-        _pinGroups.Clear();
-        _renderedCustomerCount = 0;
-        _renderedLocationCount = 0;
         var pins = new List<Pin>(locations.Count);
 
         foreach (var locationGroup in locations)
@@ -179,11 +174,15 @@ public partial class MapPage : ContentPage
             pin.MarkerClicked += OnPinClicked;
             pins.Add(pin);
             _pinGroups[pin] = locationGroup;
+            _renderedLocationAddresses.Add(locationGroup.Address);
             _renderedCustomerCount += customers.Count;
             _renderedLocationCount++;
         }
 
-        CustomerMapView.ReplacePins(pins);
+        // Append only the newly geocoded locations. Clearing and recreating every
+        // annotation during an active pan/zoom makes MapKit rebuild its cluster
+        // graph repeatedly and can leave its native annotation container invalid.
+        CustomerMapView.AppendPins(pins);
     }
 
     private static bool IsValidMapCoordinate(Location location) =>
@@ -197,7 +196,7 @@ public partial class MapPage : ContentPage
     {
         _mapLoaded = true;
         EnsureInitialMapRegion();
-        _lastRenderSignature = null;
+        CustomerMapView.RefreshPins();
         RenderVisiblePins();
         UpdateStatusLabel();
     }

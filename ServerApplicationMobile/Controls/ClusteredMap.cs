@@ -25,4 +25,27 @@ public sealed class ClusteredMap : MauiMapControl
 
         Handler?.UpdateValue(nameof(MauiMap.Pins));
     }
+
+    public void AppendPins(IEnumerable<Pin> pins)
+    {
+        var additions = pins as IReadOnlyCollection<Pin> ?? pins.ToList();
+        if (additions.Count == 0)
+            return;
+
+        IsReplacingPins = true;
+
+        try
+        {
+            foreach (var pin in additions)
+                Pins.Add(pin);
+        }
+        finally
+        {
+            IsReplacingPins = false;
+        }
+
+        Handler?.UpdateValue(nameof(MauiMap.Pins));
+    }
+
+    public void RefreshPins() => Handler?.UpdateValue(nameof(MauiMap.Pins));
 }

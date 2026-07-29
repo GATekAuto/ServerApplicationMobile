@@ -1,4 +1,5 @@
 using ServerApplicationMobile.Services;
+using System.Collections.Specialized;
 
 namespace ServerApplicationMobile;
 
@@ -11,6 +12,7 @@ public partial class AppTabbedPage
     private readonly TabBar _tabBar;
     private readonly Tab _chatTab;
     private readonly SemaphoreSlim _alertGate = new(1, 1);
+    private readonly SemaphoreSlim _notificationNavigationGate = new(1, 1);
     private bool _subscribed;
 
     public AppTabbedPage(
@@ -66,6 +68,8 @@ public partial class AppTabbedPage
             System.Diagnostics.Debug.WriteLine(
                 $"Chat notification initialization failed: {ex.Message}");
         }
+
+        await TryOpenPendingNotificationAsync();
     }
 
     private void OnShellNavigated(object sender, ShellNavigatedEventArgs e)
@@ -143,6 +147,8 @@ public partial class AppTabbedPage
         _chatService.CustomerChatRead += OnCustomerChatRead;
         _chatService.ServiceTechChatRead += OnServiceTechChatRead;
         _chatService.PropertyChanged += OnChatServicePropertyChanged;
+        _chatService.ServiceTechs.CollectionChanged += OnServiceTechsChanged;
+        ChatNotificationActivation.ActivationRequested += OnNotificationActivationRequested;
         _subscribed = true;
         UpdateChatTabTitle();
     }
@@ -158,6 +164,8 @@ public partial class AppTabbedPage
         _chatService.CustomerChatRead -= OnCustomerChatRead;
         _chatService.ServiceTechChatRead -= OnServiceTechChatRead;
         _chatService.PropertyChanged -= OnChatServicePropertyChanged;
+        _chatService.ServiceTechs.CollectionChanged -= OnServiceTechsChanged;
+        ChatNotificationActivation.ActivationRequested -= OnNotificationActivationRequested;
         _subscribed = false;
     }
 
@@ -172,7 +180,9 @@ public partial class AppTabbedPage
     private void OnNewChatOpened(object sender, ChatSessionOpenedEventArgs e)
     {
         UpdateChatTabTitle();
-        if (!_chatPage.IsShowingChat(e.Session))
+        if (IsPendingNotificationTarget(e.Session))
+            _ = TryOpenPendingNotificationAsync();
+        else if (!_chatPage.IsShowingChat(e.Session))
             _ = PresentNewChatNotificationAsync(e.Session);
     }
 
@@ -181,7 +191,9 @@ public partial class AppTabbedPage
         CustomerChatMessageReceivedEventArgs e)
     {
         UpdateChatTabTitle();
-        if (!_chatPage.IsShowingChat(e.Session))
+        if (IsPendingNotificationTarget(e.Session))
+            _ = TryOpenPendingNotificationAsync();
+        else if (!_chatPage.IsShowingChat(e.Session))
             _ = PresentCustomerMessageNotificationAsync(e.Session, e.Message);
     }
 
@@ -190,7 +202,9 @@ public partial class AppTabbedPage
         ServiceTechMessageReceivedEventArgs e)
     {
         UpdateChatTabTitle();
-        if (!IsShowingServiceTechChat(e.Session))
+        if (IsPendingNotificationTarget(e.Session))
+            _ = TryOpenPendingNotificationAsync();
+        else if (!IsShowingServiceTechChat(e.Session))
             _ = PresentServiceTechNotificationAsync(e.Session, e.Message);
     }
 
@@ -326,6 +340,105 @@ public partial class AppTabbedPage
         _tabBar.CurrentItem = _chatTab;
         _chatPage.OpenChat(session);
         UpdateChatTabTitle();
+    }
+
+    private void OnNotificationActivationRequested()
+    {
+        MainThread.BeginInvokeOnMainThread(
+            () => _ = TryOpenPendingNotificationAsync());
+    }
+
+    private void OnServiceTechsChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (ChatNotificationActivation.Peek()?.Kind ==
+            ChatNotificationTargetKind.ServiceTech)
+        {
+            _ = TryOpenPendingNotificationAsync();
+        }
+    }
+
+    private async Task TryOpenPendingNotificationAsync()
+    {
+        if (!_authenticationService.IsAuthenticated)
+            return;
+
+        await _notificationNavigationGate.WaitAsync();
+        try
+        {
+            var target = ChatNotificationActivation.Peek();
+            if (target == null)
+                return;
+
+            if (target.Kind == ChatNotificationTargetKind.Customer)
+            {
+                var customerChat = _chatService.Chats.FirstOrDefault(session =>
+                    string.Equals(
+                        session.ChatID,
+                        target.ConversationId,
+                        StringComparison.OrdinalIgnoreCase));
+                if (customerChat == null)
+                {
+                    _chatService.StartConnecting();
+                    return;
+                }
+
+                await ShowChatTabRootAsync();
+                OpenChat(customerChat);
+                ChatNotificationActivation.Complete(target);
+                return;
+            }
+
+            var serviceTechChat = _chatService.ServiceTechs.FirstOrDefault(session =>
+                string.Equals(
+                    session.Key,
+                    target.ConversationId,
+                    StringComparison.OrdinalIgnoreCase));
+            if (serviceTechChat == null)
+            {
+                _chatService.StartConnecting();
+                return;
+            }
+
+            await ShowChatTabRootAsync();
+            await _chatPage.OpenServiceTechChatAsync(serviceTechChat);
+            ChatNotificationActivation.Complete(target);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(
+                $"Opening chat notification failed: {ex}");
+        }
+        finally
+        {
+            _notificationNavigationGate.Release();
+        }
+    }
+
+    private async Task ShowChatTabRootAsync()
+    {
+        _tabBar.CurrentItem = _chatTab;
+        if (_chatPage.Navigation.NavigationStack.Count > 1)
+            await _chatPage.Navigation.PopToRootAsync(animated: false);
+    }
+
+    private static bool IsPendingNotificationTarget(ChatSession session)
+    {
+        var target = ChatNotificationActivation.Peek();
+        return target?.Kind == ChatNotificationTargetKind.Customer &&
+            string.Equals(
+                target.ConversationId,
+                session.ChatID,
+                StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsPendingNotificationTarget(ServiceTechSession session)
+    {
+        var target = ChatNotificationActivation.Peek();
+        return target?.Kind == ChatNotificationTargetKind.ServiceTech &&
+            string.Equals(
+                target.ConversationId,
+                session.Key,
+                StringComparison.OrdinalIgnoreCase);
     }
 
     private void UpdateChatTabTitle()

@@ -39,7 +39,6 @@ public sealed class ClusteredMapHandler : MapHandler
 internal sealed class ClusteredMauiMapView : MauiMKMapView
 {
     private const string CustomerReuseIdentifier = "customer-pin";
-    private const string ClusterReuseIdentifier = "customer-cluster";
     // A continental view still shows every customer cluster, while avoiding
     // MapKit's unstable all-world annotation layout on physical devices.
     private const double MaximumCameraDistanceMeters = 12_000_000;
@@ -48,6 +47,13 @@ internal sealed class ClusteredMauiMapView : MauiMKMapView
     public ClusteredMauiMapView(IMapHandler handler)
         : base(handler)
     {
+        // Register the two view types before any annotations are added. Using
+        // MapKit's dedicated cluster reuse queue prevents an ordinary point
+        // annotation view from being recycled as a cluster view.
+        Register(typeof(MKMarkerAnnotationView), CustomerReuseIdentifier);
+        Register(
+            typeof(MKMarkerAnnotationView),
+            MKMapViewDefault.ClusterAnnotationViewReuseIdentifier.ToString());
         GetViewForAnnotation = CreateAnnotationView;
         DidSelectAnnotationView += OnAnnotationSelected;
         SetCameraZoomRange(
@@ -60,24 +66,17 @@ internal sealed class ClusteredMauiMapView : MauiMKMapView
         if (Runtime.GetNSObject(annotation.Handle) is MKUserLocation)
             return null!;
 
-        if (annotation is MKClusterAnnotation cluster)
-        {
-            var clusterView = mapView.DequeueReusableAnnotation(ClusterReuseIdentifier)
-                as MKMarkerAnnotationView
-                ?? new MKMarkerAnnotationView(annotation, ClusterReuseIdentifier);
+        // Returning null lets MapKit create and manage MKClusterAnnotation views
+        // through its reserved cluster reuse identifier. The previous manual
+        // assignment could leave MapKit associating a recycled cluster view with
+        // an MKPointAnnotation and crash on the native memberAnnotations selector.
+        if (annotation is MKClusterAnnotation)
+            return null!;
 
-            clusterView.Annotation = annotation;
-            clusterView.CanShowCallout = false;
-            clusterView.MarkerTintColor = UIColor.SystemBlue;
-            clusterView.GlyphText = cluster.MemberAnnotations.Length.ToString();
-            return clusterView;
-        }
+        var pinView = (MKMarkerAnnotationView)mapView.DequeueReusableAnnotation(
+            CustomerReuseIdentifier,
+            annotation);
 
-        var pinView = mapView.DequeueReusableAnnotation(CustomerReuseIdentifier)
-            as MKMarkerAnnotationView
-            ?? new MKMarkerAnnotationView(annotation, CustomerReuseIdentifier);
-
-        pinView.Annotation = annotation;
         pinView.CanShowCallout = true;
         pinView.ClusteringIdentifier = CustomerClusterIdentifier;
         pinView.RightCalloutAccessoryView ??= new UIView();

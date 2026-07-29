@@ -17,6 +17,8 @@ namespace ServerApplicationMobile.Services;
 /// </summary>
 public sealed class ChatNotificationService
 {
+    internal const string NotificationChatKindKey = "atek_chat_kind";
+    internal const string NotificationConversationIdKey = "atek_conversation_id";
 #if ANDROID
     private const string ChannelId = "atek_chat_messages_v2";
     private const string NotificationTag = "atek_chat";
@@ -25,6 +27,8 @@ public sealed class ChatNotificationService
     private bool _initialized;
 #elif IOS
     private static readonly ForegroundNotificationDelegate NotificationDelegate = new();
+    private static readonly NSString ChatKindUserInfoKey = new(NotificationChatKindKey);
+    private static readonly NSString ConversationIdUserInfoKey = new(NotificationConversationIdKey);
 #endif
 
     public Task InitializeAsync()
@@ -68,7 +72,10 @@ public sealed class ChatNotificationService
             CustomerNotificationKey(session),
             "New customer chat",
             body,
-            session.UnreadCount);
+            session.UnreadCount,
+            new ChatNotificationTarget(
+                ChatNotificationTargetKind.Customer,
+                session.ChatID));
     }
 
     public Task<bool> TryShowAsync(
@@ -82,7 +89,10 @@ public sealed class ChatNotificationService
             ServiceTechNotificationKey(session),
             session.DisplayName,
             body,
-            session.UnreadCount);
+            session.UnreadCount,
+            new ChatNotificationTarget(
+                ChatNotificationTargetKind.ServiceTech,
+                session.Key));
     }
 
     public Task<bool> TryShowCustomerMessageAsync(
@@ -99,7 +109,10 @@ public sealed class ChatNotificationService
             CustomerNotificationKey(session),
             title,
             body,
-            session.UnreadCount);
+            session.UnreadCount,
+            new ChatNotificationTarget(
+                ChatNotificationTargetKind.Customer,
+                session.ChatID));
     }
 
     public Task DismissAsync(ChatSession session) =>
@@ -141,7 +154,8 @@ public sealed class ChatNotificationService
         string notificationKey,
         string title,
         string body,
-        int unreadCount)
+        int unreadCount,
+        ChatNotificationTarget target)
     {
 #if ANDROID
         return MainThread.InvokeOnMainThreadAsync(() =>
@@ -162,13 +176,15 @@ public sealed class ChatNotificationService
                 return false;
 
             launchIntent.AddFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop);
+            launchIntent.PutExtra(NotificationChatKindKey, target.Kind.ToString());
+            launchIntent.PutExtra(NotificationConversationIdKey, target.ConversationId);
             var pendingFlags = PendingIntentFlags.UpdateCurrent;
             if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
                 pendingFlags |= PendingIntentFlags.Immutable;
 
             var pendingIntent = PendingIntent.GetActivity(
                 context,
-                requestCode: 4107,
+                requestCode: GetNotificationId(notificationKey),
                 launchIntent,
                 pendingFlags);
 
@@ -203,7 +219,7 @@ public sealed class ChatNotificationService
             return true;
         });
 #elif IOS
-        return ShowIosNotificationAsync(notificationKey, title, body, unreadCount);
+        return ShowIosNotificationAsync(notificationKey, title, body, unreadCount, target);
 #else
         return Task.FromResult(false);
 #endif
@@ -275,6 +291,11 @@ public sealed class ChatNotificationService
         manager.CreateNotificationChannel(channel);
     }
 #elif IOS
+    internal static void ConfigureIosNotificationHandling()
+    {
+        UNUserNotificationCenter.Current.Delegate = NotificationDelegate;
+    }
+
     private static async Task InitializeIosAsync()
     {
         var center = UNUserNotificationCenter.Current;
@@ -289,7 +310,8 @@ public sealed class ChatNotificationService
         string notificationKey,
         string title,
         string body,
-        int unreadCount)
+        int unreadCount,
+        ChatNotificationTarget target)
     {
         try
         {
@@ -309,6 +331,12 @@ public sealed class ChatNotificationService
                 Badge = NSNumber.FromInt32(Math.Max(1, unreadCount)),
                 Sound = UNNotificationSound.Default
             };
+            using var userInfo = new NSMutableDictionary
+            {
+                [ChatKindUserInfoKey] = new NSString(target.Kind.ToString()),
+                [ConversationIdUserInfoKey] = new NSString(target.ConversationId)
+            };
+            content.UserInfo = userInfo;
             using var trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(
                 0.1,
                 repeats: false);
@@ -339,6 +367,24 @@ public sealed class ChatNotificationService
                 UNNotificationPresentationOptions.List |
                 UNNotificationPresentationOptions.Sound |
                 UNNotificationPresentationOptions.Badge);
+        }
+
+        public override void DidReceiveNotificationResponse(
+            UNUserNotificationCenter center,
+            UNNotificationResponse response,
+            Action completionHandler)
+        {
+            try
+            {
+                var userInfo = response.Notification.Request.Content.UserInfo;
+                ChatNotificationActivation.TryPublish(
+                    userInfo?[ChatKindUserInfoKey]?.ToString(),
+                    userInfo?[ConversationIdUserInfoKey]?.ToString());
+            }
+            finally
+            {
+                completionHandler();
+            }
         }
     }
 #endif
