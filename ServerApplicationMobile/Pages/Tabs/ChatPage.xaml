@@ -8,6 +8,7 @@
 
     <Grid Padding="12" RowDefinitions="Auto,*" RowSpacing="8">
         <Frame Grid.Row="0"
+               IsVisible="{Binding IsChatListVisible}"
                Padding="10"
                CornerRadius="8"
                HasShadow="False"
@@ -48,13 +49,26 @@
                 <CollectionView x:Name="ChatsCollection"
                                 Grid.Row="1"
                                 ItemsSource="{Binding Chats}"
+                                ItemsLayout="VerticalList"
+                                HorizontalOptions="Fill"
+                                HorizontalScrollBarVisibility="Never"
                                 SelectionMode="Single"
-                                SelectionChanged="OnChatSelected"
-                                EmptyView="No active customer chats.">
+                                SelectionChanged="OnChatSelected">
+                    <CollectionView.EmptyView>
+                        <Grid HorizontalOptions="Fill"
+                              Padding="12,24">
+                            <Label Text="No active customer chats."
+                                   HorizontalOptions="Fill"
+                                   HorizontalTextAlignment="Center"
+                                   LineBreakMode="NoWrap"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                        </Grid>
+                    </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="local:ChatSession">
                             <Border Margin="0,4"
                                     Padding="12,10"
+                                    HorizontalOptions="Fill"
                                     Stroke="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
                                     StrokeThickness="1"
                                     BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
@@ -116,6 +130,7 @@
                 <CollectionView x:Name="MessagesCollection"
                                 Grid.Row="1"
                                 SelectionMode="None"
+                                ItemsUpdatingScrollMode="KeepLastItemInView"
                                 EmptyView="No messages in this chat yet.">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="local:ChatMessageItem">
@@ -154,6 +169,7 @@
                            Grid.Column="1"
                            Placeholder="Type a message"
                            ReturnType="Send"
+                           Focused="OnMessageEntryFocused"
                            Completed="OnMessageCompleted"
                            IsEnabled="False" />
                     <Button x:Name="SendButton"

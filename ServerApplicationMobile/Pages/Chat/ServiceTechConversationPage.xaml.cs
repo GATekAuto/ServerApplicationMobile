@@ -34,6 +34,7 @@ public partial class ServiceTechConversationPage : ContentPage
         }
 
         _chatService.MarkServiceTechRead(ServiceTech);
+        UpdateMessagesLayout();
         UpdateComposerState();
         ScrollMessagesToEnd();
     }
@@ -58,6 +59,13 @@ public partial class ServiceTechConversationPage : ContentPage
     private async void OnMessageCompleted(object sender, EventArgs e)
     {
         await SendCurrentMessageAsync();
+    }
+
+    private async void OnMessageEntryFocused(object sender, FocusEventArgs e)
+    {
+        await Task.Delay(300);
+        UpdateMessagesLayout();
+        ScrollMessagesToEnd();
     }
 
     private async Task SendCurrentMessageAsync()
@@ -94,7 +102,21 @@ public partial class ServiceTechConversationPage : ContentPage
     private void OnMessagesChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
         _chatService.MarkServiceTechRead(ServiceTech);
+        UpdateMessagesLayout();
         ScrollMessagesToEnd();
+    }
+
+    private void UpdateMessagesLayout()
+    {
+        var messageCount = ServiceTech.Messages.Count;
+        var isShortConversation = messageCount is > 0 and <= 3;
+
+        MessagesCollection.VerticalOptions = isShortConversation
+            ? LayoutOptions.End
+            : LayoutOptions.Fill;
+        MessagesCollection.MaximumHeightRequest = isShortConversation
+            ? Math.Min(396, 36 + (messageCount * 120))
+            : double.PositiveInfinity;
     }
 
     private void OnServiceTechPropertyChanged(object sender, PropertyChangedEventArgs e)

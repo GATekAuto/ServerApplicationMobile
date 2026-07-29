@@ -53,6 +53,7 @@ public partial class ChatPage : ContentPage
 
             MessagesCollection.ItemsSource = _selectedChat?.Messages;
             RaisePropertyChanged();
+            UpdateMessagesLayout();
             UpdateComposerState();
             ScrollMessagesToEnd();
         }
@@ -160,6 +161,15 @@ public partial class ChatPage : ContentPage
         await SendCurrentMessageAsync();
     }
 
+    private async void OnMessageEntryFocused(object sender, FocusEventArgs e)
+    {
+        // Wait for the iOS keyboard resize animation before anchoring the final
+        // bubble above the composer.
+        await Task.Delay(300);
+        UpdateMessagesLayout();
+        ScrollMessagesToEnd();
+    }
+
     private async Task SendCurrentMessageAsync()
     {
         var text = MessageEntry.Text;
@@ -252,7 +262,21 @@ public partial class ChatPage : ContentPage
     {
         if (SelectedChat != null)
             _chatService.MarkRead(SelectedChat);
+        UpdateMessagesLayout();
         ScrollMessagesToEnd();
+    }
+
+    private void UpdateMessagesLayout()
+    {
+        var messageCount = SelectedChat?.Messages.Count ?? 0;
+        var isShortConversation = messageCount is > 0 and <= 3;
+
+        MessagesCollection.VerticalOptions = isShortConversation
+            ? LayoutOptions.End
+            : LayoutOptions.Fill;
+        MessagesCollection.MaximumHeightRequest = isShortConversation
+            ? Math.Min(396, 36 + (messageCount * 120))
+            : double.PositiveInfinity;
     }
 
     private void UpdateComposerState()
