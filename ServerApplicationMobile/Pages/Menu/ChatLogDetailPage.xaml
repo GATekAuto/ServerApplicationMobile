@@ -7,10 +7,11 @@
         <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="10">
             <Label Text="{Binding CustomerName}" FontSize="22" FontAttributes="Bold" />
-            <Label Text="{Binding DisplayDate}" FontAttributes="Bold" TextColor="#315EA8" />
+            <Label Text="{Binding DisplayDate}" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
 
             <Label Text="Chat history" FontSize="17" FontAttributes="Bold" Margin="0,8,0,0" />
-            <Border Stroke="#D7DEE8" StrokeThickness="1" BackgroundColor="#F5F7FA"
+            <Border Stroke="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}" StrokeThickness="1"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource PageBackgroundLight}, Dark={StaticResource CardBackgroundDark}}"
                     Padding="12" MinimumHeightRequest="160">
                 <Editor x:Name="TranscriptEditor"
                         IsReadOnly="True"
@@ -18,10 +19,10 @@
                         IsSpellCheckEnabled="False"
                         IsTextPredictionEnabled="False"
                         BackgroundColor="Transparent"
-                        TextColor="#101828"
+                        TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
                         FontSize="14" />
             </Border>
-            <Label x:Name="TranscriptStatusLabel" FontSize="11" TextColor="#B42318"
+            <Label x:Name="TranscriptStatusLabel" FontSize="11" TextColor="{AppThemeBinding Light={StaticResource DangerLight}, Dark={StaticResource DangerDark}}"
                    IsVisible="False" />
 
             <Label Text="Chat information" FontSize="17" FontAttributes="Bold" Margin="0,8,0,0" />

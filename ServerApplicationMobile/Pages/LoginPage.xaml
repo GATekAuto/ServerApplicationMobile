@@ -6,18 +6,19 @@
     <ScrollView>
         <Grid Padding="40" MinimumWidthRequest="300">
             <VerticalStackLayout VerticalOptions="Center" Spacing="16" MaximumWidthRequest="480">
-                <Image Source="appicon.png"
+                <Image Source="atek_logo.png"
                        HorizontalOptions="Center"
-                       HeightRequest="88" />
+                       HeightRequest="88"
+                       Aspect="AspectFit" />
 
-                <Label Text="ATek Service"
+                <Label Text="Login"
                        FontSize="26"
                        FontAttributes="Bold"
                        HorizontalTextAlignment="Center" />
 
-                <Label Text="Service tech name / User ID" FontSize="16" />
+                <Label Text="Email" FontSize="16" />
                 <Entry x:Name="entrUsername"
-                       Placeholder="Enter your service tech name"
+                       Placeholder="Email"
                        ReturnType="Next"
                        TextChanged="OnCredentialsChanged" />
 
@@ -37,7 +38,7 @@
                 </HorizontalStackLayout>
 
                 <Label x:Name="ErrorLabel"
-                       TextColor="#B3261E"
+                       TextColor="{AppThemeBinding Light={StaticResource DangerLight}, Dark={StaticResource DangerDark}}"
                        IsVisible="False"
                        LineBreakMode="WordWrap" />
 

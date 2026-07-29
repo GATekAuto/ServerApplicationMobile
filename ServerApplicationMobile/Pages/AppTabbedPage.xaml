@@ -8,10 +8,10 @@
        Shell.TitleColor="#FFFFFF"
        Shell.DisabledColor="#98A2B3"
        Shell.UnselectedColor="#D0D5DD"
-       Shell.TabBarBackgroundColor="#FFFFFF"
-       Shell.TabBarForegroundColor="#315EA8"
-       Shell.TabBarTitleColor="#315EA8"
-       Shell.TabBarUnselectedColor="#667085">
+       Shell.TabBarBackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}"
+       Shell.TabBarForegroundColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}"
+       Shell.TabBarTitleColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}"
+       Shell.TabBarUnselectedColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}">
 
     <!-- Tabs are created once with their DI-backed pages in code-behind. -->
 </Shell>

@@ -3,30 +3,30 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:ServerApplicationMobile.Services"
              x:Class="ServerApplicationMobile.ServiceTechConversationPage"
-             BackgroundColor="#F5F7FA">
+             BackgroundColor="{AppThemeBinding Light={StaticResource PageBackgroundLight}, Dark={StaticResource PageBackgroundDark}}">
 
     <Grid Padding="12" RowDefinitions="Auto,*,Auto" RowSpacing="8">
         <Border Padding="10"
-                Stroke="#D7DEE8"
+                Stroke="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
                 StrokeThickness="1"
-                BackgroundColor="White">
+                BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="8" />
             </Border.StrokeShape>
             <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
                 <Label Text="{Binding ServiceTech.DisplayName}"
                        FontAttributes="Bold"
-                       TextColor="#1F2937"
+                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
                        LineBreakMode="TailTruncation" />
                 <Label Grid.Column="1"
                        Text="{Binding ServiceTech.OnlineStatus}"
                        FontSize="11"
-                       TextColor="#237A45" />
+                       TextColor="{AppThemeBinding Light={StaticResource SuccessLight}, Dark={StaticResource SuccessDark}}" />
                 <Label Grid.Row="1"
                        Grid.ColumnSpan="2"
                        Text="{Binding ServiceTech.Details}"
                        FontSize="11"
-                       TextColor="#667085"
+                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
                        LineBreakMode="TailTruncation" />
             </Grid>
         </Border>
@@ -40,9 +40,9 @@
                 <DataTemplate x:DataType="local:ChatMessageItem">
                     <Border Margin="0,3"
                             Padding="10,7"
-                            Stroke="#D7DEE8"
+                            Stroke="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
                             StrokeThickness="1"
-                            BackgroundColor="White">
+                            BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="10" />
                         </Border.StrokeShape>
@@ -50,16 +50,16 @@
                             <Label Text="{Binding SenderName}"
                                    FontSize="11"
                                    FontAttributes="Bold"
-                                   TextColor="#315EA8" />
+                                   TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
                             <Label Grid.Column="1"
                                    Text="{Binding MessageTime, StringFormat='{0:t}'}"
                                    FontSize="10"
-                                   TextColor="#667085" />
+                                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
                             <Label Grid.Row="1"
                                    Grid.ColumnSpan="2"
                                    Text="{Binding Message}"
                                    LineBreakMode="WordWrap"
-                                   TextColor="#1F2937" />
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                         </Grid>
                     </Border>
                 </DataTemplate>

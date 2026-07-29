@@ -17,6 +17,14 @@ on:
           - simulator
           - unsigned-device-ipa
           - signed-ipa
+      configuration:
+        description: Select Debug for a faster test build or Release for distribution
+        required: true
+        default: Release
+        type: choice
+        options:
+          - Debug
+          - Release
 
 permissions:
   contents: read
@@ -30,6 +38,7 @@ env:
   APP_PROJECT: Code/ATekWebCommon/ServerApplicationMobile/ServerApplicationMobile/ServerApplicationMobile.csproj
   COMMON_ROOT: Code/ATekCommon
   IOS_FRAMEWORK: net10.0-ios
+  BUILD_CONFIGURATION: ${{ github.event_name == 'workflow_dispatch' && inputs.configuration || 'Release' }}
 
 jobs:
   simulator:
@@ -85,7 +94,7 @@ jobs:
         run: >-
           dotnet build "$APP_PROJECT"
           --framework "$IOS_FRAMEWORK"
-          --configuration Release
+          --configuration "$BUILD_CONFIGURATION"
           --no-restore
           -p:RuntimeIdentifier=iossimulator-arm64
           -p:ArchiveOnBuild=false
@@ -93,7 +102,7 @@ jobs:
       - name: Package the Simulator app
         shell: bash
         run: |
-          app_path="$(find "$APP_ROOT/ServerApplicationMobile/bin/Release/$IOS_FRAMEWORK/iossimulator-arm64" -maxdepth 1 -type d -name '*.app' -print -quit)"
+          app_path="$(find "$APP_ROOT/ServerApplicationMobile/bin/$BUILD_CONFIGURATION/$IOS_FRAMEWORK/iossimulator-arm64" -maxdepth 1 -type d -name '*.app' -print -quit)"
           if [[ -z "$app_path" ]]; then
             echo "::error::The iOS Simulator .app bundle was not produced."
             exit 1
@@ -103,7 +112,7 @@ jobs:
       - name: Upload the Simulator artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ServerApplicationMobile-iOS-Simulator-NOT-FOR-IPHONE
+          name: ServerApplicationMobile-iOS-Simulator-${{ env.BUILD_CONFIGURATION }}-NOT-FOR-IPHONE
           path: ServerApplicationMobile-iOS-Simulator.zip
           if-no-files-found: error
           retention-days: 14
@@ -159,7 +168,7 @@ jobs:
         run: >-
           dotnet publish "$APP_PROJECT"
           --framework "$IOS_FRAMEWORK"
-          --configuration Release
+          --configuration "$BUILD_CONFIGURATION"
           --no-restore
           -p:RuntimeIdentifier=ios-arm64
           -p:EnableCodeSigning=false
@@ -170,7 +179,7 @@ jobs:
       - name: Package the unsigned device IPA
         shell: bash
         run: |
-          output_root="$APP_ROOT/ServerApplicationMobile/bin/Release/$IOS_FRAMEWORK/ios-arm64"
+          output_root="$APP_ROOT/ServerApplicationMobile/bin/$BUILD_CONFIGURATION/$IOS_FRAMEWORK/ios-arm64"
           app_path="$(find "$output_root" -type d -name 'ServerApplicationMobile.app' -print -quit)"
           if [[ -z "$app_path" ]]; then
             echo "::error::The unsigned ios-arm64 device app was not produced."
@@ -187,7 +196,7 @@ jobs:
       - name: Upload the unsigned device IPA
         uses: actions/upload-artifact@v7
         with:
-          name: ServerApplicationMobile-iOS-Device-Unsigned-REQUIRES-SIGNING
+          name: ServerApplicationMobile-iOS-Device-${{ env.BUILD_CONFIGURATION }}-Unsigned-REQUIRES-SIGNING
           path: ServerApplicationMobile-iOS-Device-Unsigned.ipa
           if-no-files-found: error
           retention-days: 14
@@ -298,7 +307,7 @@ jobs:
         run: >-
           dotnet publish "$APP_PROJECT"
           --framework "$IOS_FRAMEWORK"
-          --configuration Release
+          --configuration "$BUILD_CONFIGURATION"
           --no-restore
           -p:RuntimeIdentifier=ios-arm64
           -p:ArchiveOnBuild=true
@@ -309,8 +318,8 @@ jobs:
       - name: Upload the signed IPA
         uses: actions/upload-artifact@v7
         with:
-          name: ServerApplicationMobile-iOS-IPA
-          path: ${{ env.APP_ROOT }}/ServerApplicationMobile/bin/Release/${{ env.IOS_FRAMEWORK }}/ios-arm64/**/*.ipa
+          name: ServerApplicationMobile-iOS-${{ env.BUILD_CONFIGURATION }}-IPA
+          path: ${{ env.APP_ROOT }}/ServerApplicationMobile/bin/${{ env.BUILD_CONFIGURATION }}/${{ env.IOS_FRAMEWORK }}/ios-arm64/**/*.ipa
           if-no-files-found: error
           retention-days: 30
 

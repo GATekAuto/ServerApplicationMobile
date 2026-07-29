@@ -7,7 +7,7 @@
         <ScrollView>
             <VerticalStackLayout Spacing="10">
                 <Label Text="{Binding TicketNumber}" FontSize="22" FontAttributes="Bold" />
-                <Label Text="{Binding Status}" FontAttributes="Bold" TextColor="#315EA8" />
+                <Label Text="{Binding Status}" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
                 <Label Text="Customer" FontAttributes="Bold" />
                 <Label Text="{Binding CustomerName}" />
                 <Label Text="Job / OEM" FontAttributes="Bold" />

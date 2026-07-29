@@ -163,6 +163,9 @@ public partial class MapPage : ContentPage
 
         foreach (var locationGroup in locations)
         {
+            if (!IsValidMapCoordinate(locationGroup.Location))
+                continue;
+
             var customers = locationGroup.Customers;
             var pin = new Pin
             {
@@ -182,6 +185,13 @@ public partial class MapPage : ContentPage
 
         CustomerMapView.ReplacePins(pins);
     }
+
+    private static bool IsValidMapCoordinate(Location location) =>
+        location != null &&
+        double.IsFinite(location.Latitude) &&
+        double.IsFinite(location.Longitude) &&
+        location.Latitude is >= -85 and <= 85 &&
+        location.Longitude is >= -180 and <= 180;
 
     private void OnMapLoaded(object sender, EventArgs e)
     {

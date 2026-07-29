@@ -40,6 +40,9 @@ internal sealed class ClusteredMauiMapView : MauiMKMapView
 {
     private const string CustomerReuseIdentifier = "customer-pin";
     private const string ClusterReuseIdentifier = "customer-cluster";
+    // A continental view still shows every customer cluster, while avoiding
+    // MapKit's unstable all-world annotation layout on physical devices.
+    private const double MaximumCameraDistanceMeters = 12_000_000;
     private static readonly NSString CustomerClusterIdentifier = new("customer-locations");
 
     public ClusteredMauiMapView(IMapHandler handler)
@@ -47,6 +50,9 @@ internal sealed class ClusteredMauiMapView : MauiMKMapView
     {
         GetViewForAnnotation = CreateAnnotationView;
         DidSelectAnnotationView += OnAnnotationSelected;
+        SetCameraZoomRange(
+            new MKMapCameraZoomRange(100, MaximumCameraDistanceMeters),
+            false);
     }
 
     private static MKAnnotationView CreateAnnotationView(MKMapView mapView, IMKAnnotation annotation)
@@ -83,8 +89,15 @@ internal sealed class ClusteredMauiMapView : MauiMKMapView
         if (e.View.Annotation is not MKClusterAnnotation cluster)
             return;
 
-        ShowAnnotations(cluster.MemberAnnotations, true);
-        DeselectAnnotation(cluster, false);
+        try
+        {
+            ShowAnnotations(cluster.MemberAnnotations, true);
+            DeselectAnnotation(cluster, false);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Unable to expand map cluster: {ex.Message}");
+        }
     }
 
     protected override void Dispose(bool disposing)

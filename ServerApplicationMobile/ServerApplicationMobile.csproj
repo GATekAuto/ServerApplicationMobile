@@ -22,6 +22,8 @@
   <ItemGroup>
     <!-- App Icon -->
     <MauiIcon Include="Resources\appicon.png" Color="#FFFFFF" ForegroundScale="0.55" />
+    <!-- The generated iOS app-icon catalog is not addressable by an Image control. -->
+    <MauiImage Include="Resources\appicon.png" Link="Resources\Images\atek_logo.png" />
     <!-- Splash Screen -->
     <MauiSplashScreen Include="Resources\appicon.png" Color="#FFFFFF" ForegroundScale="0.6" />
     <!-- Images -->
@@ -36,6 +38,12 @@
     <AndroidResource Include="Platforms\Android\Resources\xml\network_security_config.xml" />
     <PackageReference Include="GMapUtils.Android" Version="2.0.0" />
   </ItemGroup>
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' And '$(Configuration)' == 'Release'">
+    <!-- WCF's serialization/callback path includes generic code that cannot always
+         be fully discovered by iOS AOT. The concrete proxy avoids Reflection.Emit;
+         the interpreter covers the remaining generic instantiations. -->
+    <MtouchInterpreter>System.ServiceModel,System.ServiceModel.Primitives,System.ServiceModel.Duplex,System.ServiceModel.NetTcp,System.ServiceModel.NetFramingBase</MtouchInterpreter>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FluentFTP" Version="54.2.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />

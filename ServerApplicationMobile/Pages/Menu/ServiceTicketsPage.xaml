@@ -4,7 +4,7 @@
              xmlns:models="clr-namespace:ServerApplicationMobile.Services"
              x:Class="ServerApplicationMobile.ServiceTicketsPage"
              Title="Service Tickets"
-             BackgroundColor="#F5F7FA">
+             BackgroundColor="{AppThemeBinding Light={StaticResource PageBackgroundLight}, Dark={StaticResource PageBackgroundDark}}">
     <Grid Padding="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
         <SearchBar x:Name="TicketSearchBar"
                    Placeholder="OEM, customer, job, or ticket"
@@ -13,11 +13,11 @@
 
         <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="8">
             <VerticalStackLayout>
-                <Label Text="From" FontSize="11" TextColor="Gray" />
+                <Label Text="From" FontSize="11" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
                 <DatePicker x:Name="StartDatePicker" DateSelected="OnFilterChanged" />
             </VerticalStackLayout>
             <VerticalStackLayout Grid.Column="1">
-                <Label Text="To" FontSize="11" TextColor="Gray" />
+                <Label Text="To" FontSize="11" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
                 <DatePicker x:Name="EndDatePicker" DateSelected="OnFilterChanged" />
             </VerticalStackLayout>
         </Grid>
@@ -37,20 +37,22 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:ServiceTicket">
                         <Frame Margin="0,4" Padding="12,10" CornerRadius="8"
-                               HasShadow="False" BorderColor="#D7DEE8" BackgroundColor="White">
+                               HasShadow="False"
+                               BorderColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
+                               BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
                             <Frame.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnTicketTapped"
                                                       CommandParameter="{Binding .}" />
                             </Frame.GestureRecognizers>
                             <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
                                 <Label Text="{Binding CustomerName}" FontAttributes="Bold" LineBreakMode="TailTruncation" />
-                                <Label Grid.Column="1" Text="{Binding Status}" FontAttributes="Bold" TextColor="#315EA8" />
-                                <Label Grid.Row="1" Text="{Binding TicketNumber}" FontSize="12" TextColor="#344054" />
-                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding DisplayDate}" FontSize="11" TextColor="#667085" />
+                                <Label Grid.Column="1" Text="{Binding Status}" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                <Label Grid.Row="1" Text="{Binding TicketNumber}" FontSize="12" TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding DisplayDate}" FontSize="11" TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
                                 <Label Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Details}" FontSize="11"
-                                       TextColor="#667085" LineBreakMode="TailTruncation" />
+                                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" LineBreakMode="TailTruncation" />
                                 <Label Grid.Row="3" Grid.ColumnSpan="2" Text="Tap to view ticket"
-                                       FontSize="10" TextColor="#315EA8" HorizontalTextAlignment="End" />
+                                       FontSize="10" TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" HorizontalTextAlignment="End" />
                             </Grid>
                         </Frame>
                     </DataTemplate>

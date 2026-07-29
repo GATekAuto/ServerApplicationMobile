@@ -9,7 +9,8 @@
             <VerticalStackLayout Spacing="5">
 
                  Header 
-                <Grid ColumnDefinitions="*,*,*,*,*" Padding="10" BackgroundColor="#eeeeee">
+                <Grid ColumnDefinitions="*,*,*,*,*" Padding="10"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource SectionBackgroundLight}, Dark={StaticResource SectionBackgroundDark}}">
                     <Label Text="Job #" Grid.Column="0" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
                     <Label Text="Serial #" Grid.Column="1" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
                     <Label Text="OEM #" Grid.Column="2" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
@@ -22,7 +23,9 @@
                             SelectionMode="None">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame Padding="10" Margin="5" CornerRadius="8" HasShadow="False" BorderColor="LightGray" BackgroundColor="White">
+                            <Frame Padding="10" Margin="5" CornerRadius="8" HasShadow="False"
+                                   BorderColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
+                                   BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
                                 <Frame.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnJobTapped" />
                                 </Frame.GestureRecognizers>
@@ -50,7 +53,8 @@
             <VerticalStackLayout Spacing="5">
 
              Header 
-            <Grid ColumnDefinitions="*,*,*,*,*" Padding="10" BackgroundColor="#eeeeee">
+            <Grid ColumnDefinitions="*,*,*,*,*" Padding="10"
+                  BackgroundColor="{AppThemeBinding Light={StaticResource SectionBackgroundLight}, Dark={StaticResource SectionBackgroundDark}}">
                 <Label Text="Type" Grid.Column="0" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
                 <Label Text="Name" Grid.Column="1" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
                 <Label Text="Version" Grid.Column="2" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
@@ -63,7 +67,9 @@
                             SelectionMode="None">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame Padding="10" Margin="5" CornerRadius="8" HasShadow="False" BorderColor="LightGray" BackgroundColor="White">
+                        <Frame Padding="10" Margin="5" CornerRadius="8" HasShadow="False"
+                               BorderColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
+                               BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
                             <Frame.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnProductTapped" />
                             </Frame.GestureRecognizers>

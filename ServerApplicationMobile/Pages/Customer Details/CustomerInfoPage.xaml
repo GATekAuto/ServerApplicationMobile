@@ -13,14 +13,14 @@
                 <Label Text="OEM" />
                 <Entry x:Name="OemEntry" IsReadOnly="True" />
 
-                <Label Text="CONTACT" Margin="0,12,0,0" FontAttributes="Bold" TextColor="#315EA8" />
+                <Label Text="CONTACT" Margin="0,12,0,0" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
                 <Entry x:Name="ContactEntry" />
                 <Label Text="Phone" />
                 <Entry x:Name="PhoneEntry" Keyboard="Telephone" />
                 <Label Text="Email" />
                 <Entry x:Name="EmailEntry" Keyboard="Email" />
 
-                <Label Text="BILLING ADDRESS" Margin="0,12,0,0" FontAttributes="Bold" TextColor="#315EA8" />
+                <Label Text="BILLING ADDRESS" Margin="0,12,0,0" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
                 <Label Text="Address 1" />
                 <Entry x:Name="BillingAddress1Entry" TextChanged="OnBillingAddressChanged" />
                 <Label Text="Address 2" />
@@ -41,7 +41,7 @@
                            VerticalTextAlignment="Center" />
                 </HorizontalStackLayout>
 
-                <Label Text="SHIPPING ADDRESS" FontAttributes="Bold" TextColor="#315EA8" />
+                <Label Text="SHIPPING ADDRESS" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
                 <Label Text="Address 1" />
                 <Entry x:Name="ShippingAddress1Entry" />
                 <Label Text="Address 2" />
@@ -57,7 +57,7 @@
 
                 <Label x:Name="ErrorLabel"
                        IsVisible="False"
-                       TextColor="#B3261E"
+                       TextColor="{AppThemeBinding Light={StaticResource DangerLight}, Dark={StaticResource DangerDark}}"
                        LineBreakMode="WordWrap"
                        Margin="0,8" />
             </VerticalStackLayout>

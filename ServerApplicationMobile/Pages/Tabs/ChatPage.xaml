@@ -4,20 +4,20 @@
              xmlns:local="clr-namespace:ServerApplicationMobile.Services"
              x:Class="ServerApplicationMobile.ChatPage"
              Title="Chat"
-             BackgroundColor="#F5F7FA">
+             BackgroundColor="{AppThemeBinding Light={StaticResource PageBackgroundLight}, Dark={StaticResource PageBackgroundDark}}">
 
     <Grid Padding="12" RowDefinitions="Auto,*" RowSpacing="8">
         <Frame Grid.Row="0"
                Padding="10"
                CornerRadius="8"
                HasShadow="False"
-               BorderColor="#D7DEE8"
-               BackgroundColor="White">
+               BorderColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
+               BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
             <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8">
                 <Label Text="{Binding ConnectionStatus}"
                        FontAttributes="Bold"
                        VerticalTextAlignment="Center"
-                       TextColor="#1F2937" />
+                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                 <Button Grid.Column="1"
                         Grid.RowSpan="2"
                         Text="{Binding ServiceTechsButtonText}"
@@ -31,8 +31,8 @@
                 <Label Grid.Row="1"
                        Text="{Binding LastError}"
                        FontSize="11"
-                       TextColor="#B42318"
-                       LineBreakMode="TailTruncation" />
+                       TextColor="{AppThemeBinding Light={StaticResource DangerLight}, Dark={StaticResource DangerDark}}"
+                       LineBreakMode="WordWrap" />
             </Grid>
         </Frame>
 
@@ -43,7 +43,7 @@
                 <Label Text="Customer chats"
                        FontSize="18"
                        FontAttributes="Bold"
-                       TextColor="#1F2937" />
+                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
 
                 <CollectionView x:Name="ChatsCollection"
                                 Grid.Row="1"
@@ -55,9 +55,9 @@
                         <DataTemplate x:DataType="local:ChatSession">
                             <Border Margin="0,4"
                                     Padding="12,10"
-                                    Stroke="#D7DEE8"
+                                    Stroke="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
                                     StrokeThickness="1"
-                                    BackgroundColor="White">
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
                                 <Border.StrokeShape>
                                     <RoundRectangle CornerRadius="8" />
                                 </Border.StrokeShape>
@@ -72,17 +72,17 @@
                                     <Label Grid.Column="1"
                                            Text="{Binding Status}"
                                            FontSize="11"
-                                           TextColor="#315EA8" />
+                                           TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
                                     <Label Grid.Row="1"
                                            Text="{Binding Details}"
                                            FontSize="11"
-                                           TextColor="#667085"
+                                           TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
                                            LineBreakMode="TailTruncation" />
                                     <Label Grid.Row="1"
                                            Grid.Column="1"
                                            Text="{Binding UnreadCount, StringFormat='Unread: {0}'}"
                                            FontSize="10"
-                                           TextColor="#B42318" />
+                                           TextColor="{AppThemeBinding Light={StaticResource DangerLight}, Dark={StaticResource DangerDark}}" />
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -102,14 +102,14 @@
                            FontAttributes="Bold"
                            FontSize="16"
                            VerticalTextAlignment="Center"
-                           TextColor="#1F2937"
+                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
                            LineBreakMode="TailTruncation" />
                     <Label Grid.Column="2"
                            Text="Customer is typing..."
                            FontSize="11"
                            FontAttributes="Italic"
                            VerticalTextAlignment="Center"
-                           TextColor="#315EA8"
+                           TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}"
                            IsVisible="{Binding SelectedChat.IsCustomerTyping}" />
                 </Grid>
 
@@ -123,22 +123,22 @@
                                    Padding="10,7"
                                    CornerRadius="10"
                                    HasShadow="False"
-                                   BorderColor="#D7DEE8"
-                                   BackgroundColor="White">
+                                   BorderColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
+                                   BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
                                 <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto">
                                     <Label Text="{Binding SenderName}"
                                            FontSize="11"
                                            FontAttributes="Bold"
-                                           TextColor="#315EA8" />
+                                           TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
                                     <Label Grid.Column="1"
                                            Text="{Binding MessageTime, StringFormat='{0:t}'}"
                                            FontSize="10"
-                                           TextColor="#667085" />
+                                           TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
                                     <Label Grid.Row="1"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding Message}"
                                            LineBreakMode="WordWrap"
-                                           TextColor="#1F2937" />
+                                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                                 </Grid>
                             </Frame>
                         </DataTemplate>

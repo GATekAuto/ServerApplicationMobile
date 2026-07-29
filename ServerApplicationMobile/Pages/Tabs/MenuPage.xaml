@@ -3,29 +3,114 @@
              x:Class="ServerApplicationMobile.MenuPage"
              Title="Menu">
     <Grid>
-    <ScrollView IsEnabled="True" x:Name="MenuView">
-        
-        <Grid RowDefinitions="Auto,Auto">
-            <Grid Padding="10" Margin="10" BackgroundColor="#eeeeee" Grid.Row="0">
-                <Label Text="Tools" FontAttributes="Bold" FontSize="18" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-            </Grid>
+        <ScrollView IsEnabled="True" x:Name="MenuView">
+            <VerticalStackLayout Padding="20,20,20,32"
+                                 Spacing="14"
+                                 MaximumWidthRequest="560"
+                                 HorizontalOptions="Fill">
+                <Label Text="Tools"
+                       Margin="4,0,4,4"
+                       FontAttributes="Bold"
+                       FontSize="22" />
 
-                <Grid Grid.Row="1" Padding="10" RowDefinitions="Auto,Auto"
-                      ColumnDefinitions="*,*" RowSpacing="10" ColumnSpacing="10"
-                      HorizontalOptions="Center" MaximumWidthRequest="380">
-                    <Button Text="Service Tickets" Clicked="OnServiceTicketsClicked"
-                            WidthRequest="110" HeightRequest="90" LineBreakMode="CharacterWrap"/>
-                    <Button Grid.Column="1" Text="Software Logs" Clicked="OnSoftwareLogsClicked"
-                            WidthRequest="110" HeightRequest="90" LineBreakMode="CharacterWrap"/>
-                    <Button Grid.Row="1" Text="Chat Logs" Clicked="OnChatLogsClicked"
-                            WidthRequest="110" HeightRequest="90" LineBreakMode="CharacterWrap"/>
-                    <Button Grid.Row="1" Grid.Column="1" Text="Log Out" Clicked="OnLogoutClicked"
-                            WidthRequest="110" HeightRequest="90"/>
+                <Grid HeightRequest="62">
+                    <Button HorizontalOptions="Fill"
+                            SemanticProperties.Description="Service Tickets"
+                            Clicked="OnServiceTicketsClicked" />
+                    <Grid Margin="22,0"
+                          ColumnDefinitions="28,*"
+                          ColumnSpacing="14"
+                          InputTransparent="True">
+                        <Image Source="jobs.png"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                        <Label Grid.Column="1"
+                               Text="Service Tickets"
+                               TextColor="White"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               LineBreakMode="NoWrap"
+                               VerticalTextAlignment="Center" />
+                    </Grid>
                 </Grid>
 
-            </Grid>
-        
-    </ScrollView>
-    <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" x:Name="ActivityIndicator" IsRunning="False"/>
+                <Grid HeightRequest="62">
+                    <Button HorizontalOptions="Fill"
+                            SemanticProperties.Description="Software Logs"
+                            Clicked="OnSoftwareLogsClicked" />
+                    <Grid Margin="22,0"
+                          ColumnDefinitions="28,*"
+                          ColumnSpacing="14"
+                          InputTransparent="True">
+                        <Image Source="info.png"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                        <Label Grid.Column="1"
+                               Text="Software Logs"
+                               TextColor="White"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               LineBreakMode="NoWrap"
+                               VerticalTextAlignment="Center" />
+                    </Grid>
+                </Grid>
+
+                <Grid HeightRequest="62">
+                    <Button HorizontalOptions="Fill"
+                            SemanticProperties.Description="Chat Logs"
+                            Clicked="OnChatLogsClicked" />
+                    <Grid Margin="22,0"
+                          ColumnDefinitions="28,*"
+                          ColumnSpacing="14"
+                          InputTransparent="True">
+                        <Image Source="chat.png"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                        <Label Grid.Column="1"
+                               Text="Chat Logs"
+                               TextColor="White"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               LineBreakMode="NoWrap"
+                               VerticalTextAlignment="Center" />
+                    </Grid>
+                </Grid>
+
+                <Grid HeightRequest="62"
+                      Margin="0,0,0,0">
+                    <Button HorizontalOptions="Fill"
+                            SemanticProperties.Description="Log Out"
+                            Clicked="OnLogoutClicked" />
+                    <Grid Margin="22,0"
+                          ColumnDefinitions="28,*"
+                          ColumnSpacing="14"
+                          InputTransparent="True">
+                        <Image Source="logout.png"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+                        <Label Grid.Column="1"
+                               Text="Log Out"
+                               TextColor="White"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               LineBreakMode="NoWrap"
+                               VerticalTextAlignment="Center" />
+                    </Grid>
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <ActivityIndicator HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           x:Name="ActivityIndicator"
+                           IsRunning="False" />
     </Grid>
 </ContentPage>

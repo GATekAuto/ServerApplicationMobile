@@ -12,6 +12,24 @@
     <Color x:Key="LightGray">#E5E5E1</Color>
     <Color x:Key="MidGray">#969696</Color>
     <Color x:Key="DarkGray">#505050</Color>
+    <Color x:Key="PageBackgroundLight">#F5F7FA</Color>
+    <Color x:Key="PageBackgroundDark">#101318</Color>
+    <Color x:Key="CardBackgroundLight">#FFFFFF</Color>
+    <Color x:Key="CardBackgroundDark">#1D232D</Color>
+    <Color x:Key="SectionBackgroundLight">#EEEEEE</Color>
+    <Color x:Key="SectionBackgroundDark">#252B35</Color>
+    <Color x:Key="TextPrimaryLight">#1F2937</Color>
+    <Color x:Key="TextPrimaryDark">#F2F4F7</Color>
+    <Color x:Key="TextSecondaryLight">#667085</Color>
+    <Color x:Key="TextSecondaryDark">#C7CDD8</Color>
+    <Color x:Key="BorderLight">#D7DEE8</Color>
+    <Color x:Key="BorderDark">#3B4553</Color>
+    <Color x:Key="AccentLight">#315EA8</Color>
+    <Color x:Key="AccentDark">#8AB8FF</Color>
+    <Color x:Key="DangerLight">#B42318</Color>
+    <Color x:Key="DangerDark">#FF8A80</Color>
+    <Color x:Key="SuccessLight">#237A45</Color>
+    <Color x:Key="SuccessDark">#64D893</Color>
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
     <SolidColorBrush x:Key="LightBrush" Color="{StaticResource Light}"/>
     <SolidColorBrush x:Key="DarkBrush" Color="{StaticResource Dark}"/>

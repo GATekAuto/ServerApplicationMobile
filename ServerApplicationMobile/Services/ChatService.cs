@@ -117,11 +117,23 @@ public sealed class ChatService : INotifyPropertyChanged
             {
                 var callback = new ChatCallback(this);
                 var binding = CreateBinding();
-                var factory = new DuplexChannelFactory<IATekChatWebService>(
-                    new InstanceContext(callback),
+                var callbackContext = new InstanceContext(callback);
+                var endpoint = new EndpointAddress(Endpoint);
+#if IOS
+                // ChannelFactory<T> generates its service proxy at runtime, which
+                // physical iOS devices prohibit. Use the concrete proxy instead.
+                var channel = (IATekChatWebService)new IosChatWcfClient(
+                    callbackContext,
                     binding,
-                    new EndpointAddress(Endpoint));
+                    endpoint);
+                DuplexChannelFactory<IATekChatWebService> factory = null;
+#else
+                var factory = new DuplexChannelFactory<IATekChatWebService>(
+                    callbackContext,
+                    binding,
+                    endpoint);
                 var channel = factory.CreateChannel();
+#endif
                 var communicationObject = (ICommunicationObject)channel;
 
                 communicationObject.Faulted += OnChannelUnavailable;

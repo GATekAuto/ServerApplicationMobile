@@ -4,17 +4,17 @@
              xmlns:local="clr-namespace:ServerApplicationMobile.Services"
              x:Class="ServerApplicationMobile.ServiceTechsPage"
              Title="Service Techs"
-             BackgroundColor="#F5F7FA">
+             BackgroundColor="{AppThemeBinding Light={StaticResource PageBackgroundLight}, Dark={StaticResource PageBackgroundDark}}">
 
     <Grid Padding="12" RowDefinitions="Auto,*" RowSpacing="10">
         <VerticalStackLayout Spacing="2">
             <Label Text="Service tech chats"
                    FontSize="20"
                    FontAttributes="Bold"
-                   TextColor="#1F2937" />
+                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
             <Label Text="Choose a technician to open a separate conversation."
                    FontSize="12"
-                   TextColor="#667085" />
+                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
         </VerticalStackLayout>
 
         <CollectionView x:Name="ServiceTechsCollection"
@@ -27,31 +27,31 @@
                 <DataTemplate x:DataType="local:ServiceTechSession">
                     <Border Margin="0,4"
                             Padding="12,10"
-                            Stroke="#D7DEE8"
+                            Stroke="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
                             StrokeThickness="1"
-                            BackgroundColor="White">
+                            BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="8" />
                         </Border.StrokeShape>
                         <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
                             <Label Text="{Binding DisplayName}"
                                    FontAttributes="Bold"
-                                   TextColor="#1F2937"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
                                    LineBreakMode="TailTruncation" />
                             <Label Grid.Column="1"
                                    Text="{Binding OnlineStatus}"
                                    FontSize="11"
-                                   TextColor="#237A45" />
+                                   TextColor="{AppThemeBinding Light={StaticResource SuccessLight}, Dark={StaticResource SuccessDark}}" />
                             <Label Grid.Row="1"
                                    Text="{Binding Details}"
                                    FontSize="11"
-                                   TextColor="#667085"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
                                    LineBreakMode="TailTruncation" />
                             <Label Grid.Row="1"
                                    Grid.Column="1"
                                    Text="{Binding UnreadCount, StringFormat='Unread: {0}'}"
                                    FontSize="10"
-                                   TextColor="#B42318" />
+                                   TextColor="{AppThemeBinding Light={StaticResource DangerLight}, Dark={StaticResource DangerDark}}" />
                         </Grid>
                     </Border>
                 </DataTemplate>

@@ -14,6 +14,7 @@ public partial class CustomersPage : ContentPage
     private IReadOnlyList<Customer> _customers = Array.Empty<Customer>();
     private bool _isLoading = false;
     private bool _hasLoaded;
+    private bool _isOpeningCustomer;
 
     public CustomersPage(
         DatabaseService databaseService,
@@ -116,16 +117,29 @@ public partial class CustomersPage : ContentPage
         }
     }
 
-    private async void OnCustomerSelected(object sender, SelectionChangedEventArgs e)
+    private async void OnCustomerTapped(object sender, TappedEventArgs e)
     {
-        if (e.CurrentSelection.FirstOrDefault() is not Customer selectedCustomer)
+        if (_isOpeningCustomer || e.Parameter is not Customer selectedCustomer)
             return;
 
-        CustomerCollectionView.SelectedItem = null;
-        await Navigation.PushAsync(new CustomerDetailPage(
-            selectedCustomer,
-            _databaseService,
-            _authenticationService));
+        _isOpeningCustomer = true;
+        try
+        {
+            if (sender is TapGestureRecognizer { Parent: VisualElement customerCard })
+            {
+                await customerCard.ScaleToAsync(0.97, 70, Easing.CubicOut);
+                await customerCard.ScaleToAsync(1.0, 90, Easing.CubicIn);
+            }
+
+            await Navigation.PushAsync(new CustomerDetailPage(
+                selectedCustomer,
+                _databaseService,
+                _authenticationService));
+        }
+        finally
+        {
+            _isOpeningCustomer = false;
+        }
     }
 
     private void OnPageLoaded(object sender, EventArgs e)
@@ -136,6 +150,7 @@ public partial class CustomersPage : ContentPage
 
     private void OnSearchSubmitted(object sender, EventArgs e)
     {
+        DismissCustomerSearchKeyboard();
         string filter = CustomerSearchBar.Text?.ToLowerInvariant().Trim();
 
         if (string.IsNullOrEmpty(filter))
@@ -155,6 +170,37 @@ public partial class CustomersPage : ContentPage
             .ToList();
 
         CustomerCollectionView.ItemsSource = filtered;
+    }
+
+    private void OnCustomerSearchFocused(object sender, FocusEventArgs e)
+    {
+        DismissSearchButton.IsVisible = DeviceInfo.Platform == DevicePlatform.iOS;
+    }
+
+    private void OnCustomerSearchUnfocused(object sender, FocusEventArgs e)
+    {
+        DismissSearchButton.IsVisible = false;
+    }
+
+    private void OnDismissSearchClicked(object sender, EventArgs e)
+    {
+        DismissCustomerSearchKeyboard();
+    }
+
+    private void OnCustomerListScrolled(object sender, ItemsViewScrolledEventArgs e)
+    {
+        if (CustomerSearchBar.IsFocused)
+            DismissCustomerSearchKeyboard();
+    }
+
+    private void DismissCustomerSearchKeyboard()
+    {
+        DismissSearchButton.IsVisible = false;
+        CustomerSearchBar.Unfocus();
+#if IOS
+        if (CustomerSearchBar.Handler?.PlatformView is UIKit.UISearchBar nativeSearchBar)
+            nativeSearchBar.ResignFirstResponder();
+#endif
     }
 
     private void CustomerSearchBar_TextChanged(object sender, TextChangedEventArgs e)
