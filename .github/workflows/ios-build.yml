@@ -15,6 +15,7 @@ on:
         type: choice
         options:
           - simulator
+          - unsigned-device-ipa
           - signed-ipa
 
 permissions:
@@ -102,8 +103,92 @@ jobs:
       - name: Upload the Simulator artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ServerApplicationMobile-iOS-Simulator
+          name: ServerApplicationMobile-iOS-Simulator-NOT-FOR-IPHONE
           path: ServerApplicationMobile-iOS-Simulator.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  unsigned-device-ipa:
+    name: Unsigned iOS Device IPA
+    if: github.event_name == 'workflow_dispatch' && inputs.build_type == 'unsigned-device-ipa'
+    runs-on: macos-26
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out the mobile app
+        uses: actions/checkout@v7
+        with:
+          path: Code/ATekWebCommon/ServerApplicationMobile
+          persist-credentials: false
+
+      - name: Check out ATekCommon
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ vars.ATEK_COMMON_REPOSITORY || format('{0}/ATekCommon', github.repository_owner) }}
+          token: ${{ secrets.ATEK_COMMON_TOKEN || github.token }}
+          path: Code/ATekCommon
+          persist-credentials: false
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: Code/ATekWebCommon/ServerApplicationMobile/global.json
+          workloads: maui-ios
+
+      - name: Select Xcode 26.6
+        run: sudo xcode-select --switch /Applications/Xcode_26.6.app/Contents/Developer
+
+      - name: Show build environment
+        run: |
+          dotnet --info
+          xcodebuild -version
+
+      - name: Restore shared projects
+        run: |
+          dotnet restore "$COMMON_ROOT/SharedEnums/SharedEnums.csproj" -p:TargetFramework=net8.0
+          dotnet restore "$COMMON_ROOT/CADSEncryptDecryptLib/CADSEncryptDecryptLib.csproj" -p:TargetFramework=net8.0
+
+      - name: Restore iOS device dependencies
+        run: >-
+          dotnet restore "$APP_PROJECT"
+          --no-dependencies
+          -p:TargetFramework="$IOS_FRAMEWORK"
+          -p:RuntimeIdentifier=ios-arm64
+
+      - name: Build the unsigned iPhone app
+        run: >-
+          dotnet publish "$APP_PROJECT"
+          --framework "$IOS_FRAMEWORK"
+          --configuration Release
+          --no-restore
+          -p:RuntimeIdentifier=ios-arm64
+          -p:EnableCodeSigning=false
+          -p:CodesignRequireProvisioningProfile=false
+          -p:ArchiveOnBuild=false
+          -p:BuildIpa=false
+
+      - name: Package the unsigned device IPA
+        shell: bash
+        run: |
+          output_root="$APP_ROOT/ServerApplicationMobile/bin/Release/$IOS_FRAMEWORK/ios-arm64"
+          app_path="$(find "$output_root" -type d -name 'ServerApplicationMobile.app' -print -quit)"
+          if [[ -z "$app_path" ]]; then
+            echo "::error::The unsigned ios-arm64 device app was not produced."
+            exit 1
+          fi
+
+          staging="$RUNNER_TEMP/unsigned-device-ipa"
+          mkdir -p "$staging/Payload"
+          ditto "$app_path" "$staging/Payload/ServerApplicationMobile.app"
+          ditto -c -k --sequesterRsrc --keepParent \
+            "$staging/Payload" \
+            "$GITHUB_WORKSPACE/ServerApplicationMobile-iOS-Device-Unsigned.ipa"
+
+      - name: Upload the unsigned device IPA
+        uses: actions/upload-artifact@v7
+        with:
+          name: ServerApplicationMobile-iOS-Device-Unsigned-REQUIRES-SIGNING
+          path: ServerApplicationMobile-iOS-Device-Unsigned.ipa
           if-no-files-found: error
           retention-days: 14
 
