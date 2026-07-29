@@ -130,17 +130,27 @@
                 <CollectionView x:Name="MessagesCollection"
                                 Grid.Row="1"
                                 SelectionMode="None"
+                                ItemSizingStrategy="MeasureAllItems"
                                 ItemsUpdatingScrollMode="KeepLastItemInView"
                                 EmptyView="No messages in this chat yet.">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="local:ChatMessageItem">
                             <Frame Margin="0,3"
                                    Padding="10,7"
+                                   HorizontalOptions="Start"
+                                   MaximumWidthRequest="340"
                                    CornerRadius="10"
                                    HasShadow="False"
                                    BorderColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
                                    BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
-                                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto">
+                                <Frame.Triggers>
+                                    <DataTrigger TargetType="Frame"
+                                                 Binding="{Binding IsSentByCurrentUser}"
+                                                 Value="True">
+                                        <Setter Property="HorizontalOptions" Value="End" />
+                                    </DataTrigger>
+                                </Frame.Triggers>
+                                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto" ColumnSpacing="8">
                                     <Label Text="{Binding SenderName}"
                                            FontSize="11"
                                            FontAttributes="Bold"
@@ -153,6 +163,7 @@
                                            Grid.ColumnSpan="2"
                                            Text="{Binding Message}"
                                            LineBreakMode="WordWrap"
+                                           HorizontalOptions="Start"
                                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                                 </Grid>
                             </Frame>

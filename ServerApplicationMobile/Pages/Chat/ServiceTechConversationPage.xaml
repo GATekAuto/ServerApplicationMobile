@@ -35,19 +35,29 @@
                         Grid.Row="1"
                         ItemsSource="{Binding ServiceTech.Messages}"
                         SelectionMode="None"
+                        ItemSizingStrategy="MeasureAllItems"
                         ItemsUpdatingScrollMode="KeepLastItemInView"
                         EmptyView="No messages in this conversation yet.">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="local:ChatMessageItem">
                     <Border Margin="0,3"
                             Padding="10,7"
+                            HorizontalOptions="Start"
+                            MaximumWidthRequest="340"
                             Stroke="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
                             StrokeThickness="1"
                             BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border"
+                                         Binding="{Binding IsSentByCurrentUser}"
+                                         Value="True">
+                                <Setter Property="HorizontalOptions" Value="End" />
+                            </DataTrigger>
+                        </Border.Triggers>
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="10" />
                         </Border.StrokeShape>
-                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto">
+                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto" ColumnSpacing="8">
                             <Label Text="{Binding SenderName}"
                                    FontSize="11"
                                    FontAttributes="Bold"
@@ -60,6 +70,7 @@
                                    Grid.ColumnSpan="2"
                                    Text="{Binding Message}"
                                    LineBreakMode="WordWrap"
+                                   HorizontalOptions="Start"
                                    TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                         </Grid>
                     </Border>

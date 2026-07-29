@@ -24,8 +24,18 @@
     <MauiIcon Include="Resources\appicon.png" Color="#FFFFFF" ForegroundScale="0.55" />
     <!-- The generated iOS app-icon catalog is not addressable by an Image control. -->
     <MauiImage Include="Resources\appicon.png" Link="Resources\Images\atek_logo.png" />
-    <!-- Splash Screen -->
-    <MauiSplashScreen Include="Resources\appicon.png" Color="#FFFFFF" ForegroundScale="0.6" />
+    <!-- Keep the launch screen aligned with the app's dark theme. Giving the
+         splash its own logical name prevents iOS from treating the same source
+         as both the app icon and the launch-screen image. -->
+    <MauiSplashScreen Include="Resources\appicon.png"
+                      Link="Resources\Splash\atek_splash.png"
+                      Color="#101318"
+                      BaseSize="240,87"
+                      Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'" />
+    <MauiSplashScreen Include="Resources\appicon.png"
+                      Color="#FFFFFF"
+                      ForegroundScale="0.6"
+                      Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'" />
     <!-- Images -->
     <MauiImage Include="Resources\Images\*" />
     <MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
