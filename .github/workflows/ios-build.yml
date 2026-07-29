@@ -27,6 +27,7 @@ concurrency:
 env:
   APP_ROOT: Code/ATekWebCommon/ServerApplicationMobile
   APP_PROJECT: Code/ATekWebCommon/ServerApplicationMobile/ServerApplicationMobile/ServerApplicationMobile.csproj
+  COMMON_ROOT: Code/ATekCommon
   IOS_FRAMEWORK: net10.0-ios
 
 jobs:
@@ -67,8 +68,17 @@ jobs:
           dotnet --info
           xcodebuild -version
 
-      - name: Restore iOS dependencies
-        run: dotnet restore "$APP_PROJECT" -p:TargetFramework="$IOS_FRAMEWORK" -p:RuntimeIdentifier=iossimulator-arm64
+      - name: Restore shared projects
+        run: |
+          dotnet restore "$COMMON_ROOT/SharedEnums/SharedEnums.csproj" -p:TargetFramework=net8.0
+          dotnet restore "$COMMON_ROOT/CADSEncryptDecryptLib/CADSEncryptDecryptLib.csproj" -p:TargetFramework=net8.0
+
+      - name: Restore iOS Simulator dependencies
+        run: >-
+          dotnet restore "$APP_PROJECT"
+          --no-dependencies
+          -p:TargetFramework="$IOS_FRAMEWORK"
+          -p:RuntimeIdentifier=iossimulator-arm64
 
       - name: Build the iOS Simulator app
         run: >-
@@ -184,8 +194,17 @@ jobs:
           echo "keychain_path=$keychain_path" >> "$GITHUB_OUTPUT"
           echo "profile_uuid=$profile_uuid" >> "$GITHUB_OUTPUT"
 
-      - name: Restore iOS dependencies
-        run: dotnet restore "$APP_PROJECT" -p:TargetFramework="$IOS_FRAMEWORK" -p:RuntimeIdentifier=ios-arm64
+      - name: Restore shared projects
+        run: |
+          dotnet restore "$COMMON_ROOT/SharedEnums/SharedEnums.csproj" -p:TargetFramework=net8.0
+          dotnet restore "$COMMON_ROOT/CADSEncryptDecryptLib/CADSEncryptDecryptLib.csproj" -p:TargetFramework=net8.0
+
+      - name: Restore iOS device dependencies
+        run: >-
+          dotnet restore "$APP_PROJECT"
+          --no-dependencies
+          -p:TargetFramework="$IOS_FRAMEWORK"
+          -p:RuntimeIdentifier=ios-arm64
 
       - name: Build the signed IPA
         env:
