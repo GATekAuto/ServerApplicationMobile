@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ServerApplicationMobile.SoftwareLogDetailPage"
+             Title="Software Log">
+    <Grid Padding="20">
+        <ScrollView>
+            <VerticalStackLayout Spacing="10">
+                <Label Text="{Binding SoftwareType}" FontSize="22" FontAttributes="Bold" />
+                <Label Text="{Binding TypeDisplay}" FontAttributes="Bold" TextColor="#315EA8" />
+                <Label Text="Version" FontAttributes="Bold" />
+                <Label Text="{Binding Version}" />
+                <Label Text="Created" FontAttributes="Bold" />
+                <Label Text="{Binding LogDate, StringFormat='{0:g}'}" />
+                <Label Text="Created by" FontAttributes="Bold" />
+                <Label Text="{Binding LogBy}" />
+                <Label Text="Description" FontAttributes="Bold" />
+                <Label Text="{Binding Description}" LineBreakMode="WordWrap" />
+                <Label x:Name="InternalNotesHeading" Text="Internal notes" FontAttributes="Bold" />
+                <Label x:Name="InternalNotesLabel" Text="{Binding InternalRemarks}" LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
+        </ScrollView>
+        <ActivityIndicator x:Name="ActivityIndicator" IsRunning="False" IsVisible="False"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+    </Grid>
+</ContentPage>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       x:Class="ServerApplicationMobile.AppTabbedPage"
+       FlyoutBehavior="Disabled"
+       Shell.BackgroundColor="#000000"
+       Shell.ForegroundColor="#FFFFFF"
+       Shell.TitleColor="#FFFFFF"
+       Shell.DisabledColor="#98A2B3"
+       Shell.UnselectedColor="#D0D5DD"
+       Shell.TabBarBackgroundColor="#FFFFFF"
+       Shell.TabBarForegroundColor="#315EA8"
+       Shell.TabBarTitleColor="#315EA8"
+       Shell.TabBarUnselectedColor="#667085">
+
+    <!-- Tabs are created once with their DI-backed pages in code-behind. -->
+</Shell>

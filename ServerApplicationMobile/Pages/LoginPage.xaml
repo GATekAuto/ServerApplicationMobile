@@ -1,0 +1,54 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ServerApplicationMobile.LoginPage"
+             Title="Sign in">
+
+    <ScrollView>
+        <Grid Padding="40" MinimumWidthRequest="300">
+            <VerticalStackLayout VerticalOptions="Center" Spacing="16" MaximumWidthRequest="480">
+                <Image Source="appicon.png"
+                       HorizontalOptions="Center"
+                       HeightRequest="88" />
+
+                <Label Text="ATek Service"
+                       FontSize="26"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center" />
+
+                <Label Text="Service tech name / User ID" FontSize="16" />
+                <Entry x:Name="entrUsername"
+                       Placeholder="Enter your service tech name"
+                       ReturnType="Next"
+                       TextChanged="OnCredentialsChanged" />
+
+                <Label Text="Password" FontSize="16" />
+                <Entry x:Name="entrPassword"
+                       IsPassword="True"
+                       Placeholder="Password"
+                       ReturnType="Go"
+                       TextChanged="OnCredentialsChanged"
+                       Completed="OnPasswordCompleted" />
+
+                <HorizontalStackLayout Spacing="8">
+                    <CheckBox x:Name="RememberSignInCheckBox"
+                              VerticalOptions="Center" />
+                    <Label Text="Keep me signed in"
+                           VerticalTextAlignment="Center" />
+                </HorizontalStackLayout>
+
+                <Label x:Name="ErrorLabel"
+                       TextColor="#B3261E"
+                       IsVisible="False"
+                       LineBreakMode="WordWrap" />
+
+                <Button Text="Sign in"
+                        Clicked="OnLoginClicked"
+                        x:Name="btnLogin"
+                        IsEnabled="False" />
+                <ActivityIndicator x:Name="ActivityIndicator"
+                                   IsRunning="False"
+                                   IsVisible="False" />
+            </VerticalStackLayout>
+        </Grid>
+    </ScrollView>
+</ContentPage>

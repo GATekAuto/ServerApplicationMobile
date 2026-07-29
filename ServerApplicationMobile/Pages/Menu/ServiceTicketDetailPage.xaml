@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ServerApplicationMobile.ServiceTicketDetailPage"
+             Title="Service Ticket">
+    <Grid Padding="20">
+        <ScrollView>
+            <VerticalStackLayout Spacing="10">
+                <Label Text="{Binding TicketNumber}" FontSize="22" FontAttributes="Bold" />
+                <Label Text="{Binding Status}" FontAttributes="Bold" TextColor="#315EA8" />
+                <Label Text="Customer" FontAttributes="Bold" />
+                <Label Text="{Binding CustomerName}" />
+                <Label Text="Job / OEM" FontAttributes="Bold" />
+                <Label Text="{Binding Details}" />
+                <Label Text="Created" FontAttributes="Bold" />
+                <Label Text="{Binding CallDate, StringFormat='{0:g}'}" />
+                <Label Text="Created by" FontAttributes="Bold" />
+                <Label Text="{Binding TicketCreatedBy}" />
+                <Label Text="Problem type" FontAttributes="Bold" />
+                <Label Text="{Binding ProblemType}" />
+                <Label Text="Problem" FontAttributes="Bold" />
+                <Label Text="{Binding ProblemInfo}" LineBreakMode="WordWrap" />
+                <Label Text="Troubleshooting steps" FontAttributes="Bold" />
+                <Label Text="{Binding TroubleShootingSteps}" LineBreakMode="WordWrap" />
+                <Label Text="Solution" FontAttributes="Bold" />
+                <Label Text="{Binding ProblemSolution}" LineBreakMode="WordWrap" />
+                <Label Text="Software" FontAttributes="Bold" />
+                <Label Text="{Binding SoftwareType}" />
+                <Label Text="{Binding VersionDisplay}" />
+                <Label Text="Machine area / item" FontAttributes="Bold" />
+                <Label Text="{Binding MachineArea}" />
+                <Label Text="{Binding MachineItem}" />
+                <Label Text="Remarks" FontAttributes="Bold" />
+                <Label Text="{Binding Remarks}" LineBreakMode="WordWrap" />
+                <Label Text="Technician required" FontAttributes="Bold" />
+                <Label Text="{Binding IsNeedToSendTech}" />
+                <Label Text="Closed by" FontAttributes="Bold" />
+                <Label Text="{Binding TicketClosedBy}" />
+                <Label Text="{Binding TicketClosedDate, StringFormat='{0:g}'}" />
+            </VerticalStackLayout>
+        </ScrollView>
+        <ActivityIndicator x:Name="ActivityIndicator" IsRunning="False" IsVisible="False"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+    </Grid>
+</ContentPage>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ServerApplicationMobile.ChatLogDetailPage"
+             Title="Chat Log">
+    <Grid>
+        <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="10">
+            <Label Text="{Binding CustomerName}" FontSize="22" FontAttributes="Bold" />
+            <Label Text="{Binding DisplayDate}" FontAttributes="Bold" TextColor="#315EA8" />
+
+            <Label Text="Chat history" FontSize="17" FontAttributes="Bold" Margin="0,8,0,0" />
+            <Border Stroke="#D7DEE8" StrokeThickness="1" BackgroundColor="#F5F7FA"
+                    Padding="12" MinimumHeightRequest="160">
+                <Editor x:Name="TranscriptEditor"
+                        IsReadOnly="True"
+                        AutoSize="TextChanges"
+                        IsSpellCheckEnabled="False"
+                        IsTextPredictionEnabled="False"
+                        BackgroundColor="Transparent"
+                        TextColor="#101828"
+                        FontSize="14" />
+            </Border>
+            <Label x:Name="TranscriptStatusLabel" FontSize="11" TextColor="#B42318"
+                   IsVisible="False" />
+
+            <Label Text="Chat information" FontSize="17" FontAttributes="Bold" Margin="0,8,0,0" />
+            <Label Text="User" FontAttributes="Bold" />
+            <Label Text="{Binding UserName}" />
+            <Label Text="OEM" FontAttributes="Bold" />
+            <Label Text="{Binding OEMName}" />
+            <Label Text="Job number" FontAttributes="Bold" />
+            <Label Text="{Binding JobNumber}" />
+            <Label Text="Phone" FontAttributes="Bold" />
+            <Label Text="{Binding PhoneNumber}" />
+            <Label Text="Chat started" FontAttributes="Bold" />
+            <Label Text="{Binding StartTime, StringFormat='{0:g}'}" />
+            <Label Text="Accepted" FontAttributes="Bold" />
+            <Label Text="{Binding AcceptedTime, StringFormat='{0:g}'}" />
+            <Label Text="Chat ID" FontAttributes="Bold" />
+            <Label Text="{Binding ChatID}" LineBreakMode="CharacterWrap" />
+        </VerticalStackLayout>
+        </ScrollView>
+        <ActivityIndicator x:Name="ActivityIndicator" IsRunning="False" IsVisible="False"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+    </Grid>
+</ContentPage>

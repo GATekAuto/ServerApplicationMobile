@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:ServerApplicationMobile.Services"
+             x:Class="ServerApplicationMobile.ChatPage"
+             Title="Chat"
+             BackgroundColor="#F5F7FA">
+
+    <Grid Padding="12" RowDefinitions="Auto,*" RowSpacing="8">
+        <Frame Grid.Row="0"
+               Padding="10"
+               CornerRadius="8"
+               HasShadow="False"
+               BorderColor="#D7DEE8"
+               BackgroundColor="White">
+            <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8">
+                <Label Text="{Binding ConnectionStatus}"
+                       FontAttributes="Bold"
+                       VerticalTextAlignment="Center"
+                       TextColor="#1F2937" />
+                <Button Grid.Column="1"
+                        Grid.RowSpan="2"
+                        Text="{Binding ServiceTechsButtonText}"
+                        Padding="12,4"
+                        Clicked="OnServiceTechsClicked" />
+                <Button Grid.Column="2"
+                        Grid.RowSpan="2"
+                        Text="Reconnect"
+                        Padding="12,4"
+                        Clicked="OnReconnectClicked" />
+                <Label Grid.Row="1"
+                       Text="{Binding LastError}"
+                       FontSize="11"
+                       TextColor="#B42318"
+                       LineBreakMode="TailTruncation" />
+            </Grid>
+        </Frame>
+
+        <Grid Grid.Row="1">
+            <Grid IsVisible="{Binding IsChatListVisible}"
+                  RowDefinitions="Auto,*"
+                  RowSpacing="8">
+                <Label Text="Customer chats"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="#1F2937" />
+
+                <CollectionView x:Name="ChatsCollection"
+                                Grid.Row="1"
+                                ItemsSource="{Binding Chats}"
+                                SelectionMode="Single"
+                                SelectionChanged="OnChatSelected"
+                                EmptyView="No active customer chats.">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="local:ChatSession">
+                            <Border Margin="0,4"
+                                    Padding="12,10"
+                                    Stroke="#D7DEE8"
+                                    StrokeThickness="1"
+                                    BackgroundColor="White">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8" />
+                                </Border.StrokeShape>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnChatCardTapped"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                    <Label Text="{Binding Title}"
+                                           FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Status}"
+                                           FontSize="11"
+                                           TextColor="#315EA8" />
+                                    <Label Grid.Row="1"
+                                           Text="{Binding Details}"
+                                           FontSize="11"
+                                           TextColor="#667085"
+                                           LineBreakMode="TailTruncation" />
+                                    <Label Grid.Row="1"
+                                           Grid.Column="1"
+                                           Text="{Binding UnreadCount, StringFormat='Unread: {0}'}"
+                                           FontSize="10"
+                                           TextColor="#B42318" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+
+            <Grid IsVisible="{Binding IsConversationVisible}"
+                  RowDefinitions="Auto,*,Auto"
+                  RowSpacing="8">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                    <Button Text="‹ Chats"
+                            Padding="10,4"
+                            Clicked="OnBackToChatsClicked" />
+                    <Label Grid.Column="1"
+                           Text="{Binding SelectedChat.Title}"
+                           FontAttributes="Bold"
+                           FontSize="16"
+                           VerticalTextAlignment="Center"
+                           TextColor="#1F2937"
+                           LineBreakMode="TailTruncation" />
+                    <Label Grid.Column="2"
+                           Text="Customer is typing..."
+                           FontSize="11"
+                           FontAttributes="Italic"
+                           VerticalTextAlignment="Center"
+                           TextColor="#315EA8"
+                           IsVisible="{Binding SelectedChat.IsCustomerTyping}" />
+                </Grid>
+
+                <CollectionView x:Name="MessagesCollection"
+                                Grid.Row="1"
+                                SelectionMode="None"
+                                EmptyView="No messages in this chat yet.">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="local:ChatMessageItem">
+                            <Frame Margin="0,3"
+                                   Padding="10,7"
+                                   CornerRadius="10"
+                                   HasShadow="False"
+                                   BorderColor="#D7DEE8"
+                                   BackgroundColor="White">
+                                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto">
+                                    <Label Text="{Binding SenderName}"
+                                           FontSize="11"
+                                           FontAttributes="Bold"
+                                           TextColor="#315EA8" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding MessageTime, StringFormat='{0:t}'}"
+                                           FontSize="10"
+                                           TextColor="#667085" />
+                                    <Label Grid.Row="1"
+                                           Grid.ColumnSpan="2"
+                                           Text="{Binding Message}"
+                                           LineBreakMode="WordWrap"
+                                           TextColor="#1F2937" />
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                    <Button x:Name="JoinButton"
+                            Text="Join"
+                            Clicked="OnJoinClicked"
+                            IsEnabled="False" />
+                    <Entry x:Name="MessageEntry"
+                           Grid.Column="1"
+                           Placeholder="Type a message"
+                           ReturnType="Send"
+                           Completed="OnMessageCompleted"
+                           IsEnabled="False" />
+                    <Button x:Name="SendButton"
+                            Grid.Column="2"
+                            Text="Send"
+                            Clicked="OnSendClicked"
+                            IsEnabled="False" />
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentPage>

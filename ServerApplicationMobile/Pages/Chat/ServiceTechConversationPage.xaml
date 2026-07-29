@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:ServerApplicationMobile.Services"
+             x:Class="ServerApplicationMobile.ServiceTechConversationPage"
+             BackgroundColor="#F5F7FA">
+
+    <Grid Padding="12" RowDefinitions="Auto,*,Auto" RowSpacing="8">
+        <Border Padding="10"
+                Stroke="#D7DEE8"
+                StrokeThickness="1"
+                BackgroundColor="White">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8" />
+            </Border.StrokeShape>
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                <Label Text="{Binding ServiceTech.DisplayName}"
+                       FontAttributes="Bold"
+                       TextColor="#1F2937"
+                       LineBreakMode="TailTruncation" />
+                <Label Grid.Column="1"
+                       Text="{Binding ServiceTech.OnlineStatus}"
+                       FontSize="11"
+                       TextColor="#237A45" />
+                <Label Grid.Row="1"
+                       Grid.ColumnSpan="2"
+                       Text="{Binding ServiceTech.Details}"
+                       FontSize="11"
+                       TextColor="#667085"
+                       LineBreakMode="TailTruncation" />
+            </Grid>
+        </Border>
+
+        <CollectionView x:Name="MessagesCollection"
+                        Grid.Row="1"
+                        ItemsSource="{Binding ServiceTech.Messages}"
+                        SelectionMode="None"
+                        EmptyView="No messages in this conversation yet.">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="local:ChatMessageItem">
+                    <Border Margin="0,3"
+                            Padding="10,7"
+                            Stroke="#D7DEE8"
+                            StrokeThickness="1"
+                            BackgroundColor="White">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
+                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto">
+                            <Label Text="{Binding SenderName}"
+                                   FontSize="11"
+                                   FontAttributes="Bold"
+                                   TextColor="#315EA8" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding MessageTime, StringFormat='{0:t}'}"
+                                   FontSize="10"
+                                   TextColor="#667085" />
+                            <Label Grid.Row="1"
+                                   Grid.ColumnSpan="2"
+                                   Text="{Binding Message}"
+                                   LineBreakMode="WordWrap"
+                                   TextColor="#1F2937" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Entry x:Name="MessageEntry"
+                   Placeholder="Type a message"
+                   ReturnType="Send"
+                   Completed="OnMessageCompleted" />
+            <Button x:Name="SendButton"
+                    Grid.Column="1"
+                    Text="Send"
+                    Clicked="OnSendClicked" />
+        </Grid>
+    </Grid>
+</ContentPage>

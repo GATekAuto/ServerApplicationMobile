@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ServerApplicationMobile.CustomerInfoPage"
+             Title="Customer Information">
+
+    <Grid RowDefinitions="*,Auto" Padding="20,10,20,20">
+        <ScrollView x:Name="FormScroll">
+            <VerticalStackLayout Spacing="10">
+
+                <Label Text="Customer Name" />
+                <Entry x:Name="CustomerNameEntry" IsReadOnly="True" />
+                <Label Text="OEM" />
+                <Entry x:Name="OemEntry" IsReadOnly="True" />
+
+                <Label Text="CONTACT" Margin="0,12,0,0" FontAttributes="Bold" TextColor="#315EA8" />
+                <Entry x:Name="ContactEntry" />
+                <Label Text="Phone" />
+                <Entry x:Name="PhoneEntry" Keyboard="Telephone" />
+                <Label Text="Email" />
+                <Entry x:Name="EmailEntry" Keyboard="Email" />
+
+                <Label Text="BILLING ADDRESS" Margin="0,12,0,0" FontAttributes="Bold" TextColor="#315EA8" />
+                <Label Text="Address 1" />
+                <Entry x:Name="BillingAddress1Entry" TextChanged="OnBillingAddressChanged" />
+                <Label Text="Address 2" />
+                <Entry x:Name="BillingAddress2Entry" TextChanged="OnBillingAddressChanged" />
+                <Label Text="City" />
+                <Entry x:Name="BillingCityEntry" TextChanged="OnBillingAddressChanged" />
+                <Label Text="State" />
+                <Entry x:Name="BillingStateEntry" TextChanged="OnBillingAddressChanged" />
+                <Label Text="Zip" />
+                <Entry x:Name="BillingZipEntry" TextChanged="OnBillingAddressChanged" />
+                <Label Text="Country" />
+                <Entry x:Name="BillingCountryEntry" TextChanged="OnBillingAddressChanged" />
+
+                <HorizontalStackLayout Margin="0,12,0,0" Spacing="8">
+                    <CheckBox x:Name="SameAddressCheckBox"
+                              CheckedChanged="OnSameAddressChanged" />
+                    <Label Text="Billing and shipping addresses are the same"
+                           VerticalTextAlignment="Center" />
+                </HorizontalStackLayout>
+
+                <Label Text="SHIPPING ADDRESS" FontAttributes="Bold" TextColor="#315EA8" />
+                <Label Text="Address 1" />
+                <Entry x:Name="ShippingAddress1Entry" />
+                <Label Text="Address 2" />
+                <Entry x:Name="ShippingAddress2Entry" />
+                <Label Text="City" />
+                <Entry x:Name="ShippingCityEntry" />
+                <Label Text="State" />
+                <Entry x:Name="ShippingStateEntry" />
+                <Label Text="Zip" />
+                <Entry x:Name="ShippingZipEntry" />
+                <Label Text="Country" />
+                <Entry x:Name="ShippingCountryEntry" />
+
+                <Label x:Name="ErrorLabel"
+                       IsVisible="False"
+                       TextColor="#B3261E"
+                       LineBreakMode="WordWrap"
+                       Margin="0,8" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="8" Margin="0,12,0,0">
+            <Button x:Name="EditButton"
+                    Grid.ColumnSpan="3"
+                    Text="Edit customer"
+                    Clicked="OnEditClicked" />
+            <Button x:Name="CancelButton"
+                    Grid.Column="1"
+                    Text="Cancel"
+                    IsVisible="False"
+                    Clicked="OnCancelClicked" />
+            <Button x:Name="SaveButton"
+                    Grid.Column="2"
+                    Text="Save"
+                    IsVisible="False"
+                    Clicked="OnSaveClicked" />
+        </Grid>
+
+        <ActivityIndicator x:Name="ActivityIndicator"
+                           Grid.RowSpan="2"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           IsVisible="False"
+                           IsRunning="False" />
+    </Grid>
+</ContentPage>

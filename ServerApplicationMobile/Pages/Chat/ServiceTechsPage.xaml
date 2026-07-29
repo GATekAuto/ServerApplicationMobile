@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:ServerApplicationMobile.Services"
+             x:Class="ServerApplicationMobile.ServiceTechsPage"
+             Title="Service Techs"
+             BackgroundColor="#F5F7FA">
+
+    <Grid Padding="12" RowDefinitions="Auto,*" RowSpacing="10">
+        <VerticalStackLayout Spacing="2">
+            <Label Text="Service tech chats"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   TextColor="#1F2937" />
+            <Label Text="Choose a technician to open a separate conversation."
+                   FontSize="12"
+                   TextColor="#667085" />
+        </VerticalStackLayout>
+
+        <CollectionView x:Name="ServiceTechsCollection"
+                        Grid.Row="1"
+                        ItemsSource="{Binding ServiceTechs}"
+                        SelectionMode="Single"
+                        SelectionChanged="OnServiceTechSelected"
+                        EmptyView="No service tech conversations are available.">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="local:ServiceTechSession">
+                    <Border Margin="0,4"
+                            Padding="12,10"
+                            Stroke="#D7DEE8"
+                            StrokeThickness="1"
+                            BackgroundColor="White">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                            <Label Text="{Binding DisplayName}"
+                                   FontAttributes="Bold"
+                                   TextColor="#1F2937"
+                                   LineBreakMode="TailTruncation" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding OnlineStatus}"
+                                   FontSize="11"
+                                   TextColor="#237A45" />
+                            <Label Grid.Row="1"
+                                   Text="{Binding Details}"
+                                   FontSize="11"
+                                   TextColor="#667085"
+                                   LineBreakMode="TailTruncation" />
+                            <Label Grid.Row="1"
+                                   Grid.Column="1"
+                                   Text="{Binding UnreadCount, StringFormat='Unread: {0}'}"
+                                   FontSize="10"
+                                   TextColor="#B42318" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

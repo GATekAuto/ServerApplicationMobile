@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ServerApplicationMobile.Pages.Customer_Details.ProductsPage"
+             Title="Products Page">
+    <Grid>
+        <VerticalStackLayout Spacing="5">
+
+            <!--Header-->
+            <Grid ColumnDefinitions="*,*,*,*,*" Padding="10" BackgroundColor="#eeeeee">
+                <Label Text="Type" Grid.Column="0" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
+                <Label Text="Name" Grid.Column="1" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
+                <Label Text="Version" Grid.Column="2" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
+                <Label Text="Qty" Grid.Column="3" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
+                <Label Text="Available" Grid.Column="4" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
+            </Grid>
+
+            <!--Products List-->
+            <CollectionView x:Name="ProductsCollectionView"
+                            SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="10" Margin="5" CornerRadius="8" HasShadow="False" BorderColor="LightGray" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnProductTapped" />
+                            </Frame.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="*,*,*,*,*">
+                                <Label Text="{Binding Type}" Grid.Column="0" FontSize="11" HorizontalOptions="Center" LineBreakMode="NoWrap" />
+                                <Label Text="{Binding ProductName}" Grid.Column="1" FontSize="11" HorizontalOptions="Center" LineBreakMode="NoWrap" />
+                                <Label Text="{Binding Version}" Grid.Column="2" FontSize="11" HorizontalOptions="Center" LineBreakMode="NoWrap" />
+                                <Label Text="{Binding Quantity}" Grid.Column="3" FontSize="11" HorizontalOptions="Center" LineBreakMode="NoWrap" />
+                                <Label Text="{Binding Available}" Grid.Column="4" FontSize="11" HorizontalOptions="Center" LineBreakMode="NoWrap" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

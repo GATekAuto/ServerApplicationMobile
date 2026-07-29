@@ -1,0 +1,31 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ServerApplicationMobile.MenuPage"
+             Title="Menu">
+    <Grid>
+    <ScrollView IsEnabled="True" x:Name="MenuView">
+        
+        <Grid RowDefinitions="Auto,Auto">
+            <Grid Padding="10" Margin="10" BackgroundColor="#eeeeee" Grid.Row="0">
+                <Label Text="Tools" FontAttributes="Bold" FontSize="18" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+            </Grid>
+
+                <Grid Grid.Row="1" Padding="10" RowDefinitions="Auto,Auto"
+                      ColumnDefinitions="*,*" RowSpacing="10" ColumnSpacing="10"
+                      HorizontalOptions="Center" MaximumWidthRequest="380">
+                    <Button Text="Service Tickets" Clicked="OnServiceTicketsClicked"
+                            WidthRequest="110" HeightRequest="90" LineBreakMode="CharacterWrap"/>
+                    <Button Grid.Column="1" Text="Software Logs" Clicked="OnSoftwareLogsClicked"
+                            WidthRequest="110" HeightRequest="90" LineBreakMode="CharacterWrap"/>
+                    <Button Grid.Row="1" Text="Chat Logs" Clicked="OnChatLogsClicked"
+                            WidthRequest="110" HeightRequest="90" LineBreakMode="CharacterWrap"/>
+                    <Button Grid.Row="1" Grid.Column="1" Text="Log Out" Clicked="OnLogoutClicked"
+                            WidthRequest="110" HeightRequest="90"/>
+                </Grid>
+
+            </Grid>
+        
+    </ScrollView>
+    <ActivityIndicator HorizontalOptions="Center" VerticalOptions="Center" x:Name="ActivityIndicator" IsRunning="False"/>
+    </Grid>
+</ContentPage>

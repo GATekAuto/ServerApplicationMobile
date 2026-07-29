@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ServerApplicationMobile.DatabaseTestPage"
+             Title="Database Test">
+    
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+            
+            <Label Text="Database Connection Test"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,20,0,30"/>
+
+            <Border Padding="15"
+                    BackgroundColor="{StaticResource Gray100}"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10"/>
+                </Border.StrokeShape>
+                
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Connection Details"
+                           FontSize="16"
+                           FontAttributes="Bold"/>
+                    <Label x:Name="ConnectionInfoLabel"
+                           Text="Click 'Test Connection' to verify database access"
+                           FontSize="12"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <Button x:Name="TestButton"
+                    Text="Test Connection"
+                    Clicked="OnTestConnectionClicked"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50"/>
+
+            <Label x:Name="StatusLabel"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,10,0,0"/>
+
+            <Button x:Name="LoadSampleDataButton"
+                    Text="Load Sample Data"
+                    Clicked="OnLoadSampleDataClicked"
+                    BackgroundColor="{StaticResource Secondary}"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50"
+                    Opacity="0"
+                    Margin="0,20,0,0"/>
+
+            <Border Padding="15"
+                    BackgroundColor="{StaticResource Gray100}"
+                    StrokeThickness="0"
+                    Margin="0,10,0,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="10"/>
+                </Border.StrokeShape>
+                
+                <ScrollView MaximumHeightRequest="300">
+                    <Label x:Name="ResultsLabel"
+                           FontSize="14"
+                           LineBreakMode="WordWrap"/>
+                </ScrollView>
+            </Border>
+
+            <Label Text="?? Tip: Use this page to test your database connection before using the app."
+                   FontSize="12"
+                   TextColor="{StaticResource Gray600}"
+                   HorizontalOptions="Center"
+                   Margin="0,20,0,0"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+    
+</ContentPage>

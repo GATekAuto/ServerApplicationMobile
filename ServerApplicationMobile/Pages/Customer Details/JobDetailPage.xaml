@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            x:Class="ServerApplicationMobile.JobDetailPage"
+            Title="Job Information"
+             Padding="25,10,25,30">
+
+    <!-- Jobs tab -->
+    <ScrollView>
+        <VerticalStackLayout Spacing="15">
+            <Label Text="Job Number" />
+            <Entry Text="{Binding JobNumber}" />
+
+            <Label Text="Serial Number" />
+            <Entry Text="{Binding SerialNumber}" />
+
+            <Label Text="OEM Number" />
+            <Entry Text="{Binding OEMNumber}" />
+
+            <Label Text="Install Date" />
+            <DatePicker Date="{Binding InstallDate}" />
+
+            <Label Text="Machine Type" />
+            <Entry Text="{Binding MachineType}" />
+
+            <Button Text="Save" Clicked="OnSaveClicked" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:ServerApplicationMobile.Services"
+             x:Class="ServerApplicationMobile.ChatLogsPage"
+             Title="Chat Logs"
+             BackgroundColor="#F5F7FA">
+    <Grid Padding="12" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="8">
+        <SearchBar x:Name="ChatSearchBar"
+                   Placeholder="Customer, OEM, job, user, or message"
+                   SearchButtonPressed="OnSearchSubmitted"
+                   TextChanged="OnSearchTextChanged" />
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="8">
+            <VerticalStackLayout>
+                <Label Text="From" FontSize="11" TextColor="Gray" />
+                <DatePicker x:Name="StartDatePicker" DateSelected="OnFilterChanged" />
+            </VerticalStackLayout>
+            <VerticalStackLayout Grid.Column="1">
+                <Label Text="To" FontSize="11" TextColor="Gray" />
+                <DatePicker x:Name="EndDatePicker" DateSelected="OnFilterChanged" />
+            </VerticalStackLayout>
+        </Grid>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <HorizontalStackLayout Spacing="6">
+                <CheckBox x:Name="AllTimeCheckBox" CheckedChanged="OnAllTimeChanged" />
+                <Label Text="Show all time" VerticalTextAlignment="Center" />
+            </HorizontalStackLayout>
+            <Button Grid.Column="1" Text="Refresh" Clicked="OnRefreshClicked" Padding="14,6" />
+        </Grid>
+
+        <RefreshView Grid.Row="3" IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
+            <CollectionView x:Name="ChatLogsCollection"
+                            SelectionMode="None"
+                            EmptyView="No chat logs match these filters.">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:ChatLog">
+                        <Frame Margin="0,4" Padding="12,10" CornerRadius="8"
+                               HasShadow="False" BorderColor="#D7DEE8" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnChatLogTapped"
+                                                      CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+                            <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                                <Label Text="{Binding CustomerName}" FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation" />
+                                <Label Grid.Column="1" Text="{Binding DisplayDate}" FontSize="11"
+                                       TextColor="#667085" />
+                                <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding Details}" FontSize="11"
+                                       TextColor="#667085" LineBreakMode="TailTruncation" />
+                                <Label Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding MessagePreview}" FontSize="12"
+                                       TextColor="#344054" MaxLines="2" LineBreakMode="TailTruncation" />
+                                <Label Grid.Row="3" Grid.ColumnSpan="2" Text="Tap to view chat log"
+                                       FontSize="10" TextColor="#315EA8" HorizontalTextAlignment="End" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <ActivityIndicator Grid.Row="3" x:Name="ActivityIndicator"
+                           IsRunning="False" IsVisible="False"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+    </Grid>
+</ContentPage>

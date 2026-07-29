@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:ServerApplicationMobile.Services"
+             x:Class="ServerApplicationMobile.SoftwareLogsPage"
+             Title="Software Logs"
+             BackgroundColor="#F5F7FA">
+    <Grid Padding="12" RowDefinitions="Auto,Auto,*" RowSpacing="8">
+        <SearchBar x:Name="LogSearchBar"
+                   Placeholder="Description, software, or created by"
+                   SearchButtonPressed="OnSearchSubmitted"
+                   TextChanged="OnSearchTextChanged" />
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Picker x:Name="LogTypePicker" Title="Log type" SelectedIndexChanged="OnTypeChanged">
+                <Picker.Items>
+                    <x:String>All</x:String>
+                    <x:String>Bug Fixed</x:String>
+                    <x:String>New Feature</x:String>
+                    <x:String>Report Bug</x:String>
+                </Picker.Items>
+            </Picker>
+            <Button Grid.Column="1" Text="Refresh" Clicked="OnRefreshClicked" Padding="14,6" />
+        </Grid>
+
+        <RefreshView Grid.Row="2" IsRefreshing="{Binding IsRefreshing}" Command="{Binding RefreshCommand}">
+            <CollectionView x:Name="LogsCollection"
+                            SelectionMode="None"
+                            EmptyView="No software logs match these filters.">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:SoftwareLog">
+                        <Frame Margin="0,4" Padding="12,10" CornerRadius="8"
+                               HasShadow="False" BorderColor="#D7DEE8" BackgroundColor="White">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnLogTapped"
+                                                      CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+                            <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                                <Label Text="{Binding SoftwareType}" FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                                <Label Grid.Column="1" Text="{Binding Version}" FontSize="12" TextColor="#315EA8" />
+                                <Label Grid.Row="1" Text="{Binding TypeDisplay}" FontSize="12" FontAttributes="Bold" />
+                                <Label Grid.Row="1" Grid.Column="1" Text="{Binding DisplayDate}" FontSize="11" TextColor="#667085" />
+                                <Label Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Description}" FontSize="12"
+                                       TextColor="#475467" MaxLines="2" LineBreakMode="TailTruncation" />
+                                <Label Grid.Row="3" Grid.ColumnSpan="2" Text="Tap to view log"
+                                       FontSize="10" TextColor="#315EA8" HorizontalTextAlignment="End" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <ActivityIndicator Grid.Row="2" x:Name="ActivityIndicator"
+                           IsRunning="False" IsVisible="False"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+    </Grid>
+</ContentPage>

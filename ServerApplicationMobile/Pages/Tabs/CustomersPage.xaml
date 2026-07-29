@@ -1,0 +1,63 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ServerApplicationMobile.CustomersPage"
+             Title="Customers">
+
+    <Grid RowSpacing="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <!-- SearchBar -->
+            <RowDefinition Height="Auto" />
+            <!-- Header -->
+            <RowDefinition Height="*" />
+            <!-- CollectionView -->
+        </Grid.RowDefinitions>
+
+        <SearchBar Placeholder="Search customers"
+                   x:Name="CustomerSearchBar"
+                   SearchButtonPressed="OnSearchSubmitted"
+                   TextChanged="CustomerSearchBar_TextChanged"
+                   Grid.Row="0"
+                   VerticalOptions="Start" />
+
+        <!-- Header row -->
+        <Grid ColumnDefinitions="*,*" Padding="10" BackgroundColor="#eeeeee" Grid.Row="1">
+            <Label Text="Name" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+            <Label Text="OEM" FontAttributes="Bold" FontSize="12" Grid.Column="1" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+        </Grid>
+
+        <!-- Data list -->
+        <CollectionView x:Name="CustomerCollectionView"
+                        Margin="0"
+                        SelectionMode="Single"
+                        SelectionChanged="OnCustomerSelected"
+                        Grid.Row="2">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Stroke="LightGray"
+                StrokeThickness="1"
+                BackgroundColor="White"
+                Padding="5"
+                Margin="5">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="6" />
+                        </Border.StrokeShape>
+
+                        <Grid ColumnDefinitions="*,*"
+                  Padding="10"
+                  VerticalOptions="Center"
+                  HorizontalOptions="Fill">
+                            <Label Text="{Binding CustomerName}" FontSize="11" Grid.Column="0"
+                       HorizontalTextAlignment="Center" VerticalOptions="Center" LineBreakMode="NoWrap" />
+                            <Label Text="{Binding OEM}" FontSize="11" Grid.Column="1"
+                       HorizontalTextAlignment="Center" VerticalOptions="Center" LineBreakMode="NoWrap" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+
+
+        </CollectionView>
+    </Grid>
+</ContentPage>

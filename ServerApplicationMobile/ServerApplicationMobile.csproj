@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net10.0-android;net10.0-ios</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ServerApplicationMobile</RootNamespace>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Display name -->
+    <ApplicationTitle>ServerApplicationMobile</ApplicationTitle>
+    <!-- App Identifier -->
+    <ApplicationId>com.ATek.ServerApplicationMobile</ApplicationId>
+    <!-- Versions -->
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+    <AndroidSdkDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android' And Exists('$(LocalAppData)\Android\Sdk')">$(LocalAppData)\Android\Sdk</AndroidSdkDirectory>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- App Icon -->
+    <MauiIcon Include="Resources\appicon.png" Color="#FFFFFF" ForegroundScale="0.55" />
+    <!-- Splash Screen -->
+    <MauiSplashScreen Include="Resources\appicon.png" Color="#FFFFFF" ForegroundScale="0.6" />
+    <!-- Images -->
+    <MauiImage Include="Resources\Images\*" />
+    <MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
+    <!-- Custom Fonts -->
+    <MauiFont Include="Resources\Fonts\*" />
+    <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+    <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <AndroidResource Include="Platforms\Android\Resources\xml\network_security_config.xml" />
+    <PackageReference Include="GMapUtils.Android" Version="2.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentFTP" Version="54.2.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Maui.Controls.Maps" Version="$(MauiVersion)" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.7.1" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="10.0.652802" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\ATekCommon\ATekWebCommonDBData\ATekChatCommon.cs"
+             Link="Shared\ATekChatCommon.cs" />
+    <ProjectReference Include="..\..\..\ATekCommon\CADSEncryptDecryptLib\CADSEncryptDecryptLib.csproj" />
+    <ProjectReference Include="..\..\..\ATekCommon\SharedEnums\SharedEnums.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Pages\Customer Details\CustomerInfoPage.xaml.cs">
+      <DependentUpon>CustomerInfoPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\Customer Details\ProductsPage.xaml.cs">
+      <DependentUpon>ProductsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\Tabs\MapPage.xaml.cs">
+      <DependentUpon>MapPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\Tabs\MenuPage.xaml.cs">
+      <DependentUpon>MenuPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\LoginPage.xaml.cs">
+      <DependentUpon>LoginPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\Customer Details\ProductDetailPage.xaml.cs">
+      <DependentUpon>ProductDetailPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\Customer Details\JobDetailPage.xaml.cs">
+      <DependentUpon>JobDetailPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\Customer Details\CustomerDetailPage.xaml.cs">
+      <DependentUpon>CustomerDetailPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\Tabs\CustomersPage.xaml.cs">
+      <DependentUpon>CustomersPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\Tabs\ChatPage.xaml.cs">
+      <DependentUpon>ChatPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\Menu\ServiceTicketsPage.xaml.cs">
+      <DependentUpon>ServiceTicketsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\Menu\ServiceTicketDetailPage.xaml.cs">
+      <DependentUpon>ServiceTicketDetailPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\Menu\SoftwareLogsPage.xaml.cs">
+      <DependentUpon>SoftwareLogsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\Menu\SoftwareLogDetailPage.xaml.cs">
+      <DependentUpon>SoftwareLogDetailPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\Menu\ChatLogsPage.xaml.cs">
+      <DependentUpon>ChatLogsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\Menu\ChatLogDetailPage.xaml.cs">
+      <DependentUpon>ChatLogDetailPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Pages\AppTabbedPage.xaml.cs">
+      <DependentUpon>AppTabbedPage.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <MauiXaml Update="Pages\Customer Details\CustomerInfoPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\Customer Details\ProductsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\Customer Details\JobsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\DatabaseTestPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\Tabs\MenuPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\Tabs\MapPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\Tabs\ChatPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\Menu\ServiceTicketsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\Menu\ServiceTicketDetailPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\Menu\SoftwareLogsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\Menu\SoftwareLogDetailPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\Menu\ChatLogsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\Menu\ChatLogDetailPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\LoginPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\Customer Details\ProductDetailPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\Customer Details\JobDetailPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Pages\Customer Details\CustomerDetailPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+  </ItemGroup>
+</Project>

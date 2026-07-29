@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            x:Class="ServerApplicationMobile.ProductDetailPage"
+            Title="Job Information">
+
+    <!-- Jobs tab -->
+    <Grid Margin="25">
+        <ScrollView>
+            <VerticalStackLayout Spacing="15">
+                <Label Text="Type" />
+                <Entry Text="{Binding Type}" />
+
+                <Label Text="Product Name" />
+                <Entry Text="{Binding ProductName}" />
+
+                <Label Text="Version" />
+                <Entry Text="{Binding Version}" />
+
+                <Label Text="Quantity" />
+                <Entry Text="{Binding Quantity}" Keyboard="Numeric" />
+
+                <Label Text="Available" />
+                <Entry Text="{Binding Available}" Keyboard="Numeric" />
+
+                <Button Text="Save" Clicked="OnSaveClicked" />
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
