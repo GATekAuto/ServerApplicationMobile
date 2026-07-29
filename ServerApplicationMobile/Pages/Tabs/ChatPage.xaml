@@ -162,7 +162,8 @@
                                     <Label Grid.Row="1"
                                            Grid.ColumnSpan="2"
                                            Text="{Binding Message}"
-                                           LineBreakMode="WordWrap"
+                                           MaximumWidthRequest="300"
+                                           LineBreakMode="CharacterWrap"
                                            HorizontalOptions="Start"
                                            TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                                 </Grid>

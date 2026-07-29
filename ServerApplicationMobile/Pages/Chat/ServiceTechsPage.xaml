@@ -20,8 +20,7 @@
         <CollectionView x:Name="ServiceTechsCollection"
                         Grid.Row="1"
                         ItemsSource="{Binding ServiceTechs}"
-                        SelectionMode="Single"
-                        SelectionChanged="OnServiceTechSelected"
+                        SelectionMode="None"
                         EmptyView="No service tech conversations are available.">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="local:ServiceTechSession">
@@ -30,6 +29,10 @@
                             Stroke="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
                             StrokeThickness="1"
                             BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnServiceTechTapped"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="8" />
                         </Border.StrokeShape>

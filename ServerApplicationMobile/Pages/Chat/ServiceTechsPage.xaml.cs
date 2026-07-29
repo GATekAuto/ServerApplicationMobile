@@ -43,18 +43,23 @@ public partial class ServiceTechsPage : ContentPage
             : $"Service Techs ({_chatService.ServiceTechUnreadCount})";
     }
 
-    private async void OnServiceTechSelected(object sender, SelectionChangedEventArgs e)
+    private async void OnServiceTechTapped(object sender, TappedEventArgs e)
     {
         if (_isNavigating ||
-            e.CurrentSelection.FirstOrDefault() is not ServiceTechSession serviceTech)
+            e.Parameter is not ServiceTechSession serviceTech)
         {
             return;
         }
 
         _isNavigating = true;
-        ServiceTechsCollection.SelectedItem = null;
         try
         {
+            if (sender is TapGestureRecognizer { Parent: VisualElement serviceTechCard })
+            {
+                await serviceTechCard.ScaleToAsync(0.97, 70, Easing.CubicOut);
+                await serviceTechCard.ScaleToAsync(1.0, 90, Easing.CubicIn);
+            }
+
             await Navigation.PushAsync(
                 new ServiceTechConversationPage(_chatService, serviceTech));
         }
