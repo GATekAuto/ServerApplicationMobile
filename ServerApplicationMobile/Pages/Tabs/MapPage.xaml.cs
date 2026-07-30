@@ -29,6 +29,7 @@ public partial class MapPage : ContentPage
     private int _renderedLocationCount;
     private bool _mapLoaded;
     private bool _locationsLoaded;
+    private bool _isOpeningMappedCustomer;
     private bool _initialRegionSet;
     private Task _initialRegionTask;
     private Location _pendingInitialLocation;
@@ -316,33 +317,54 @@ public partial class MapPage : ContentPage
     {
         e.HideInfoWindow = true;
 
-        if (sender is not Pin pin || !_pinGroups.TryGetValue(pin, out var locationGroup))
+        if (_isOpeningMappedCustomer ||
+            sender is not Pin pin ||
+            !_pinGroups.TryGetValue(pin, out var locationGroup))
             return;
 
-        var customers = locationGroup.Customers;
-
-        Customer selectedCustomer;
-        if (customers.Count == 1)
+        _isOpeningMappedCustomer = true;
+        try
         {
-            selectedCustomer = customers[0];
+            var customers = locationGroup.Customers;
+
+            Customer selectedCustomer;
+            if (customers.Count == 1)
+            {
+                selectedCustomer = customers[0];
+            }
+            else
+            {
+                var choices = customers
+                    .Select(customer => $"{customer.CustomerName} ({customer.OEM})")
+                    .ToArray();
+                var choice = await MainThread.InvokeOnMainThreadAsync(() =>
+                    DisplayActionSheetAsync(
+                        "Customers at this location",
+                        "Cancel",
+                        null,
+                        choices));
+                var selectedIndex = Array.IndexOf(choices, choice);
+                if (selectedIndex < 0)
+                    return;
+
+                selectedCustomer = customers[selectedIndex];
+            }
+
+            await MainThread.InvokeOnMainThreadAsync(() =>
+                Navigation.PushAsync(new CustomerDetailPage(
+                    selectedCustomer,
+                    _databaseService,
+                    _authenticationService)));
         }
-        else
+        catch (Exception ex)
         {
-            var choices = customers
-                .Select(customer => $"{customer.CustomerName} ({customer.OEM})")
-                .ToArray();
-            var choice = await DisplayActionSheet("Customers at this location", "Cancel", null, choices);
-            var selectedIndex = Array.IndexOf(choices, choice);
-            if (selectedIndex < 0)
-                return;
-
-            selectedCustomer = customers[selectedIndex];
+            System.Diagnostics.Debug.WriteLine(
+                $"MapPage: Unable to open mapped customer: {ex}");
         }
-
-        await Navigation.PushAsync(new CustomerDetailPage(
-            selectedCustomer,
-            _databaseService,
-            _authenticationService));
+        finally
+        {
+            _isOpeningMappedCustomer = false;
+        }
     }
 
     private static string BuildGeocodeQuery(Customer customer)

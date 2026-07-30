@@ -11,6 +11,7 @@ public partial class CustomerDetailPage : ContentPage
 
     private List<Job> jobs = new();
     private List<Product> products = new();
+    private bool _isOpeningChildPage;
 
     public CustomerDetailPage(
         Customer customer,
@@ -52,9 +53,20 @@ public partial class CustomerDetailPage : ContentPage
         }
     }
 
-    private void OnJobClicked(object sender, EventArgs e)
+    private async void OnJobClicked(object sender, EventArgs e)
     {
-        Navigation.PushAsync(new JobsPage(jobs));
+        if (_isOpeningChildPage)
+            return;
+
+        _isOpeningChildPage = true;
+        try
+        {
+            await Navigation.PushAsync(new JobsPage(jobs));
+        }
+        finally
+        {
+            _isOpeningChildPage = false;
+        }
     }
     
     private void OnProductClicked(object sender, EventArgs e)

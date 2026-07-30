@@ -18,7 +18,11 @@
             <Entry Text="{Binding OEMNumber}" />
 
             <Label Text="Install Date" />
-            <DatePicker Date="{Binding InstallDate}" />
+            <!-- InstallDate is returned by the existing database layer as display
+                 text. Binding it to DatePicker.Date causes a native conversion
+                 failure when the value is blank or cannot be parsed. -->
+            <Entry Text="{Binding InstallDate}"
+                   IsReadOnly="True" />
 
             <Label Text="Machine Type" />
             <Entry Text="{Binding MachineType}" />
