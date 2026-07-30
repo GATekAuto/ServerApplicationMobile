@@ -45,6 +45,8 @@ public partial class MapPage : ContentPage
     {
         base.OnAppearing();
 
+        await EnableUserLocationAsync();
+
         EnsureInitialMapRegion();
 
         if (_loadTask == null)
@@ -60,7 +62,6 @@ public partial class MapPage : ContentPage
             System.Diagnostics.Debug.WriteLine($"MapPage: Unable to load locations: {ex.Message}");
         }
     }
-
     private async Task LoadLocationsAsync()
     {
         var customers = await _customerDataService.GetCustomersAsync();
@@ -96,8 +97,6 @@ public partial class MapPage : ContentPage
                 pending.Add(request);
             }
         }
-
-        // Cached pins appear immediately while uncached postal codes resolve in the background.
         RenderVisiblePins();
         UpdateStatusLabel();
 
@@ -179,9 +178,6 @@ public partial class MapPage : ContentPage
             _renderedLocationCount++;
         }
 
-        // Append only the newly geocoded locations. Clearing and recreating every
-        // annotation during an active pan/zoom makes MapKit rebuild its cluster
-        // graph repeatedly and can leave its native annotation container invalid.
         CustomerMapView.AppendPins(pins);
     }
 
@@ -201,16 +197,35 @@ public partial class MapPage : ContentPage
         UpdateStatusLabel();
     }
 
+    private bool _initialRegionSet;
+
     private void EnsureInitialMapRegion()
     {
-        if (!_mapLoaded || CustomerMapView.VisibleRegion != null)
+        if (!_mapLoaded || _initialRegionSet)
             return;
 
-        CustomerMapView.MoveToRegion(MapSpan.FromCenterAndRadius(
-            new Location(39.8283, -98.5795),
-            Distance.FromMiles(1_800)));
+        _initialRegionSet = true;
+
+        CustomerMapView.MoveToRegion(
+            MapSpan.FromCenterAndRadius(
+                new Location(39.8283, -98.5795),
+                Distance.FromMiles(1_800)));
     }
 
+    private async Task EnableUserLocationAsync()
+    {
+        var permission =
+            await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+
+        if (permission != PermissionStatus.Granted)
+        {
+            permission =
+                await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+        }
+
+        CustomerMapView.IsShowingUser =
+            permission == PermissionStatus.Granted;
+    }
     private void UpdateStatusLabel()
     {
         if (!_locationsLoaded)
