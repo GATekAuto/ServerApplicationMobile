@@ -29,6 +29,10 @@ public partial class MapPage : ContentPage
     private int _renderedLocationCount;
     private bool _mapLoaded;
     private bool _locationsLoaded;
+    private bool _initialRegionSet;
+    private Task _initialRegionTask;
+    private Location _pendingInitialLocation;
+    private double _pendingInitialRadiusMiles;
 
     public MapPage(
         DatabaseService databaseService,
@@ -45,12 +49,12 @@ public partial class MapPage : ContentPage
     {
         base.OnAppearing();
 
-        await EnableUserLocationAsync();
-
-        EnsureInitialMapRegion();
-
         if (_loadTask == null)
             _loadTask = LoadLocationsAsync();
+
+        // Start the customer query immediately, but resolve the initial camera
+        // independently so iOS does not remain at MapKit's default region.
+        await EnsureInitialMapRegionAsync();
 
         try
         {
@@ -191,28 +195,100 @@ public partial class MapPage : ContentPage
     private void OnMapLoaded(object sender, EventArgs e)
     {
         _mapLoaded = true;
-        EnsureInitialMapRegion();
+
+        if (_pendingInitialLocation != null)
+        {
+            ApplyInitialMapRegion(
+                _pendingInitialLocation,
+                _pendingInitialRadiusMiles);
+        }
+        else
+        {
+            _ = EnsureInitialMapRegionAsync();
+        }
+
         CustomerMapView.RefreshPins();
         RenderVisiblePins();
         UpdateStatusLabel();
     }
 
-    private bool _initialRegionSet;
-
-    private void EnsureInitialMapRegion()
+    private Task EnsureInitialMapRegionAsync()
     {
-        if (!_mapLoaded || _initialRegionSet)
+        return _initialRegionTask ??= ResolveInitialMapRegionAsync();
+    }
+
+    private async Task ResolveInitialMapRegionAsync()
+    {
+        Location location = null;
+
+        try
+        {
+            var permission = await EnableUserLocationAsync();
+            if (permission == PermissionStatus.Granted)
+            {
+                // A last-known fix makes repeat launches feel immediate on iOS.
+                location = await Geolocation.Default.GetLastKnownLocationAsync();
+
+                if (!IsValidMapCoordinate(location))
+                {
+                    var request = new GeolocationRequest(
+                        GeolocationAccuracy.Medium,
+                        TimeSpan.FromSeconds(10));
+                    location = await Geolocation.Default.GetLocationAsync(request);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(
+                $"MapPage: Unable to determine the device location: {ex.Message}");
+        }
+
+        if (IsValidMapCoordinate(location))
+        {
+            await SetInitialMapRegionAsync(location, radiusMiles: 20);
+            return;
+        }
+
+        // Permission denied, location disabled, or no GPS fix. Keep a useful
+        // fallback instead of leaving MapKit at its Maui default location.
+        await SetInitialMapRegionAsync(
+            new Location(39.8283, -98.5795),
+            radiusMiles: 1_800);
+    }
+
+    private Task SetInitialMapRegionAsync(Location location, double radiusMiles)
+    {
+        return MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            if (_initialRegionSet)
+                return;
+
+            if (!_mapLoaded)
+            {
+                _pendingInitialLocation = location;
+                _pendingInitialRadiusMiles = radiusMiles;
+                return;
+            }
+
+            ApplyInitialMapRegion(location, radiusMiles);
+        });
+    }
+
+    private void ApplyInitialMapRegion(Location location, double radiusMiles)
+    {
+        if (_initialRegionSet || !IsValidMapCoordinate(location))
             return;
 
         _initialRegionSet = true;
-
+        _pendingInitialLocation = null;
         CustomerMapView.MoveToRegion(
             MapSpan.FromCenterAndRadius(
-                new Location(39.8283, -98.5795),
-                Distance.FromMiles(1_800)));
+                location,
+                Distance.FromMiles(radiusMiles)));
     }
 
-    private async Task EnableUserLocationAsync()
+    private async Task<PermissionStatus> EnableUserLocationAsync()
     {
         var permission =
             await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
@@ -225,6 +301,8 @@ public partial class MapPage : ContentPage
 
         CustomerMapView.IsShowingUser =
             permission == PermissionStatus.Granted;
+
+        return permission;
     }
     private void UpdateStatusLabel()
     {

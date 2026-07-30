@@ -1167,6 +1167,7 @@ public sealed class ChatSession : INotifyPropertyChanged
     public ChatSession(CATekClientCredential credential)
     {
         ChatID = credential.ChatID;
+        Messages.CollectionChanged += (_, _) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MessagePreview)));
         UpdateFrom(credential);
     }
 
@@ -1191,6 +1192,18 @@ public sealed class ChatSession : INotifyPropertyChanged
         : CompanyName;
     public string Details => string.Join(" • ", new[] { JobNumber, OEMName, PhoneNumber }
         .Where(value => !string.IsNullOrWhiteSpace(value)));
+    public string MessagePreview
+    {
+        get
+        {
+            var latest = Messages.LastOrDefault(item => !string.IsNullOrWhiteSpace(item.Message));
+            if (latest == null) return "No message received yet.";
+
+            var message = string.Join(" ", latest.Message.Split(new[] { '\r', '\n', '\t' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+            var sender = FirstNotEmpty(latest.SenderName, "Customer");
+            return $"{sender}: {message}";
+        }
+    }
     public string Status => IsEnded ? "Ended" : IsJoined ? "Joined" : IsAccepted ? "In progress" : "Requested";
     public bool CanJoin => !IsEnded && !IsJoined;
     public bool CanSend => !IsEnded && IsJoined;

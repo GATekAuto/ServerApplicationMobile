@@ -79,7 +79,9 @@
                                     <TapGestureRecognizer Tapped="OnChatCardTapped"
                                                           CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
-                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                <Grid ColumnDefinitions="*,Auto"
+                                      RowDefinitions="Auto,Auto,Auto"
+                                      RowSpacing="2">
                                     <Label Text="{Binding Title}"
                                            FontAttributes="Bold"
                                            LineBreakMode="TailTruncation" />
@@ -97,6 +99,14 @@
                                            Text="{Binding UnreadCount, StringFormat='Unread: {0}'}"
                                            FontSize="10"
                                            TextColor="{AppThemeBinding Light={StaticResource DangerLight}, Dark={StaticResource DangerDark}}" />
+                                    <Label Grid.Row="2"
+                                           Grid.ColumnSpan="2"
+                                           Margin="0,6,0,0"
+                                           Text="{Binding MessagePreview}"
+                                           FontSize="13"
+                                           MaxLines="3"
+                                           LineBreakMode="TailTruncation"
+                                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
                                 </Grid>
                             </Border>
                         </DataTemplate>

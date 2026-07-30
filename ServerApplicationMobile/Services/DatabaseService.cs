@@ -165,18 +165,20 @@ public sealed class DatabaseService
             AddTextParameter(command, "@USER", userId);
             await using var reader = await command.ExecuteReaderAsync();
 
-            if (await reader.ReadAsync() &&
-                string.Equals(GetString(reader, 1), encryptedPassword, StringComparison.Ordinal))
+            if (!await reader.ReadAsync() ||
+                !string.Equals(GetString(reader, 1), encryptedPassword, StringComparison.Ordinal))
             {
-                return new AuthenticatedUser
-                {
-                    UserID = GetString(reader, 0),
-                    OEMName = GetString(reader, 2),
-                    DisplayName = GetString(reader, 3),
-                    Role = (enumOEMUserRole)GetInt32(reader, 4),
-                    IsOemAdministrator = false
-                };
+                return null;
             }
+
+            return new AuthenticatedUser
+            {
+                UserID = GetString(reader, 0),
+                OEMName = GetString(reader, 2),
+                DisplayName = GetString(reader, 3),
+                Role = (enumOEMUserRole)GetInt32(reader, 4),
+                IsOemAdministrator = false
+            };
         }
 
         await using (var command = CreateStoredProcedure(connection, "OEM_GetAllOEMsData"))
@@ -188,15 +190,14 @@ public sealed class DatabaseService
                     continue;
 
                 var oemName = GetString(reader, 0);
-                // A phone model is not a useful chat identity. For password-only
-                // OEM administrator accounts, use the name entered on the login
-                // screen as the service technician identity.
-                var serviceTechName = userId.Trim();
+                var deviceName = string.IsNullOrWhiteSpace(DeviceInfo.Name)
+                    ? Environment.MachineName
+                    : DeviceInfo.Name;
                 return new AuthenticatedUser
                 {
-                    UserID = serviceTechName,
+                    UserID = deviceName,
                     OEMName = oemName,
-                    DisplayName = serviceTechName,
+                    DisplayName = deviceName,
                     Role = enumOEMUserRole.Admin,
                     IsOemAdministrator = true
                 };
