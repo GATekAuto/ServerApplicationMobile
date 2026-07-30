@@ -33,10 +33,10 @@ public partial class AppTabbedPage
         var mapPage = new MapPage(databaseService, customerDataService, authenticationService);
         var menuPage = new MenuPage();
 
-        ApplyLoggedInTitle(customersPage);
-        ApplyLoggedInTitle(_chatPage);
-        ApplyLoggedInTitle(mapPage);
-        ApplyLoggedInTitle(menuPage);
+        ApplyLoggedInTitle(customersPage, showBrandLogo: true);
+        ApplyLoggedInTitle(_chatPage, showBrandLogo: true);
+        ApplyLoggedInTitle(mapPage, showBrandLogo: true);
+        ApplyLoggedInTitle(menuPage, showBrandLogo: true);
 
         var customersTab = CreateTab("Customers", "customers.png", "customers", customersPage);
         _chatTab = CreateTab("Chat", "chat.png", "chat", _chatPage);
@@ -77,7 +77,7 @@ public partial class AppTabbedPage
         ApplyLoggedInTitle(CurrentPage);
     }
 
-    private void ApplyLoggedInTitle(Page page)
+    private void ApplyLoggedInTitle(Page page, bool showBrandLogo = false)
     {
         if (page == null || Shell.GetTitleView(page) != null)
             return;
@@ -87,20 +87,37 @@ public partial class AppTabbedPage
             ? user.DisplayName
             : user?.UserID ?? "Service Tech";
 
-        var pageTitle = new Label
+        View leadingTitle;
+        if (showBrandLogo)
         {
-            Text = page.Title,
-            FontSize = 18,
-            FontAttributes = FontAttributes.Bold,
-            TextColor = Colors.White,
-            VerticalTextAlignment = TextAlignment.Center,
-            LineBreakMode = LineBreakMode.TailTruncation
-        };
-        page.PropertyChanged += (_, args) =>
+            leadingTitle = new Image
+            {
+                Source = "atek_logo.png",
+                WidthRequest = 76,
+                HeightRequest = 28,
+                Aspect = Aspect.AspectFit,
+                HorizontalOptions = LayoutOptions.Start,
+                VerticalOptions = LayoutOptions.Center
+            };
+        }
+        else
         {
-            if (args.PropertyName == nameof(Page.Title))
-                pageTitle.Text = page.Title;
-        };
+            var pageTitle = new Label
+            {
+                Text = page.Title,
+                FontSize = 18,
+                FontAttributes = FontAttributes.Bold,
+                TextColor = Colors.White,
+                VerticalTextAlignment = TextAlignment.Center,
+                LineBreakMode = LineBreakMode.TailTruncation
+            };
+            page.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName == nameof(Page.Title))
+                    pageTitle.Text = page.Title;
+            };
+            leadingTitle = pageTitle;
+        }
 
         var loggedInLabel = new Label
         {
@@ -125,7 +142,7 @@ public partial class AppTabbedPage
                 new ColumnDefinition(GridLength.Auto)
             }
         };
-        titleView.Add(pageTitle);
+        titleView.Add(leadingTitle);
         titleView.Add(loggedInLabel, column: 1);
         Shell.SetTitleView(page, titleView);
     }

@@ -34,7 +34,18 @@ public sealed class ChatNotificationService
     public Task InitializeAsync()
     {
 #if ANDROID
-        return MainThread.InvokeOnMainThreadAsync(() =>
+        return InitializeAndroidAsync();
+#elif IOS
+        return InitializeIosAsync();
+#else
+        return Task.CompletedTask;
+#endif
+    }
+
+#if ANDROID
+    private async Task InitializeAndroidAsync()
+    {
+        await MainThread.InvokeOnMainThreadAsync(() =>
         {
             var context = Android.App.Application.Context;
             if (!_initialized)
@@ -56,12 +67,10 @@ public sealed class ChatNotificationService
                 }
             }
         });
-#elif IOS
-        return InitializeIosAsync();
-#else
-        return Task.CompletedTask;
-#endif
+
+        await global::ServerApplicationMobile.AndroidPushRegistration.InitializeAsync();
     }
+#endif
 
     public Task<bool> TryShowAsync(ChatSession session)
     {
@@ -304,6 +313,8 @@ public sealed class ChatNotificationService
             UNAuthorizationOptions.Alert |
             UNAuthorizationOptions.Badge |
             UNAuthorizationOptions.Sound);
+        await MainThread.InvokeOnMainThreadAsync(
+            UIApplication.SharedApplication.RegisterForRemoteNotifications);
     }
 
     private static async Task<bool> ShowIosNotificationAsync(

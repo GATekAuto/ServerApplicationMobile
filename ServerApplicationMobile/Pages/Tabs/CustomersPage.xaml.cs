@@ -31,91 +31,99 @@ public partial class CustomersPage : ContentPage
     private async void CustomersPage_Appearing(object sender, EventArgs e)
     {
         if (!_isLoading && !_hasLoaded)
-        {
             await LoadCustomersAsync();
-        }
     }
 
-    private async Task LoadCustomersAsync()
+    private async Task LoadCustomersAsync(bool forceRefresh = false)
     {
-        if (_isLoading) return;
-        
+        if (_isLoading)
+            return;
+
         _isLoading = true;
-        
+        var showInitialLoadingState = !_hasLoaded && !forceRefresh;
+        SetInitialLoadingState(showInitialLoadingState);
+
         try
         {
-            System.Diagnostics.Debug.WriteLine("CustomersPage: Starting to load customers...");
-            
-            // Show loading state (if you have a loading indicator in XAML)
-            // LoadingIndicator.IsVisible = true;
-            // LoadingIndicator.IsRunning = true;
-            
-            // Load customers from database
-            System.Diagnostics.Debug.WriteLine("CustomersPage: Calling GetCustomersAsync...");
-            _customers = await _customerDataService.GetCustomersAsync();
-            
-            System.Diagnostics.Debug.WriteLine($"CustomersPage: Received {_customers.Count} customers");
-            
-            if (_customers.Any())
-            {
-                System.Diagnostics.Debug.WriteLine($"CustomersPage: Setting ItemsSource with {_customers.Count} customers");
-                
-                // Update UI on main thread
-                await MainThread.InvokeOnMainThreadAsync(() =>
-                {
-                    CustomerCollectionView.ItemsSource = _customers;
-                    _hasLoaded = true;
-                    System.Diagnostics.Debug.WriteLine($"CustomersPage: ItemsSource set. CollectionView has {CustomerCollectionView.ItemsSource?.Cast<object>()?.Count() ?? 0} items");
-                });
-                
-                // Log first few customers for verification
-                int count = 0;
-                foreach (var customer in _customers.Take(3))
-                {
-                    count++;
-                    System.Diagnostics.Debug.WriteLine($"  Customer {count}: ID={customer.CustomerID}, Name={customer.CustomerName}");
-                }
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("CustomersPage: No customers returned from database");
-                await MainThread.InvokeOnMainThreadAsync(() =>
-                {
-                    CustomerCollectionView.ItemsSource = new List<Customer>();
-                    _hasLoaded = true;
-                });
-                await DisplayAlert("No Data", "No customers found in database.", "OK");
-            }
+            var customers = forceRefresh
+                ? await _customerDataService.RefreshCustomersAsync()
+                : await _customerDataService.GetCustomersAsync();
+
+            _customers = customers
+                .OrderBy(customer => customer.DisplayName, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            _hasLoaded = true;
+            ApplyCustomerFilter();
         }
         catch (Exception ex)
         {
-            // Log detailed error
-            System.Diagnostics.Debug.WriteLine($"CustomersPage ERROR: {ex.GetType().Name}");
-            System.Diagnostics.Debug.WriteLine($"  Message: {ex.Message}");
-            System.Diagnostics.Debug.WriteLine($"  Stack: {ex.StackTrace}");
-            
-            if (ex.InnerException != null)
-            {
-                System.Diagnostics.Debug.WriteLine($"  Inner Exception: {ex.InnerException.Message}");
-            }
-            
-            await MainThread.InvokeOnMainThreadAsync(async () =>
-            {
+            System.Diagnostics.Debug.WriteLine($"CustomersPage: Unable to load customers: {ex}");
+
+            if (!_hasLoaded)
                 CustomerCollectionView.ItemsSource = new List<Customer>();
-                await DisplayAlert("Error", $"Failed to load customers: {ex.Message}\n\nCheck Output window for details.", "OK");
-            });
+
+            CustomerCountLabel.Text = "Customers unavailable";
+            EmptyTitleLabel.Text = "Unable to load customers";
+            EmptyDetailLabel.Text = "Pull down to try again.";
+            await DisplayAlert("Customers", $"Unable to load customers: {ex.Message}", "OK");
         }
         finally
         {
             _isLoading = false;
-            
-            // Hide loading state
-            // LoadingIndicator.IsVisible = false;
-            // LoadingIndicator.IsRunning = false;
-            
-            System.Diagnostics.Debug.WriteLine("CustomersPage: Load customers completed");
+            SetInitialLoadingState(false);
+            CustomerRefreshView.IsRefreshing = false;
         }
     }
+
+    private void SetInitialLoadingState(bool isLoading)
+    {
+        LoadingState.IsVisible = isLoading;
+        LoadingIndicator.IsRunning = isLoading;
+        CustomerRefreshView.IsVisible = !isLoading;
+
+        if (isLoading)
+            CustomerCountLabel.Text = "Loading customers…";
+    }
+
+    private void ApplyCustomerFilter()
+    {
+        var filter = CustomerSearchBar.Text?.Trim();
+        IEnumerable<Customer> matches = _customers;
+
+        if (!string.IsNullOrWhiteSpace(filter))
+        {
+            matches = matches.Where(customer =>
+                Contains(customer.CustomerName, filter) ||
+                Contains(customer.CompanyName, filter) ||
+                Contains(customer.OEM, filter) ||
+                Contains(customer.Contact, filter) ||
+                Contains(customer.City, filter) ||
+                Contains(customer.State, filter) ||
+                Contains(customer.Country, filter) ||
+                Contains(customer.Email, filter));
+        }
+
+        var visibleCustomers = matches.ToList();
+        CustomerCollectionView.ItemsSource = visibleCustomers;
+
+        CustomerCountLabel.Text = string.IsNullOrWhiteSpace(filter)
+            ? FormatCustomerCount(_customers.Count)
+            : $"{visibleCustomers.Count:N0} of {_customers.Count:N0} customers";
+
+        EmptyTitleLabel.Text = string.IsNullOrWhiteSpace(filter)
+            ? "No customers found"
+            : "No matching customers";
+        EmptyDetailLabel.Text = string.IsNullOrWhiteSpace(filter)
+            ? "Pull down to try loading the customer list again."
+            : "Try a different name, OEM, contact, or location.";
+    }
+
+    private static bool Contains(string value, string filter) =>
+        !string.IsNullOrWhiteSpace(value) &&
+        value.Contains(filter, StringComparison.OrdinalIgnoreCase);
+
+    private static string FormatCustomerCount(int count) =>
+        count == 1 ? "1 customer" : $"{count:N0} customers";
 
     private async void OnCustomerTapped(object sender, TappedEventArgs e)
     {
@@ -142,34 +150,10 @@ public partial class CustomersPage : ContentPage
         }
     }
 
-    private void OnPageLoaded(object sender, EventArgs e)
-    {
-        CustomerCollectionView.InvalidateMeasure();
-        this.ForceLayout();
-    }
-
     private void OnSearchSubmitted(object sender, EventArgs e)
     {
         DismissCustomerSearchKeyboard();
-        string filter = CustomerSearchBar.Text?.ToLowerInvariant().Trim();
-
-        if (string.IsNullOrEmpty(filter))
-        {
-            CustomerCollectionView.ItemsSource = _customers;
-            return;
-        }
-
-        var filtered = _customers
-            .Where(c =>
-                (!string.IsNullOrEmpty(c.CustomerName) && c.CustomerName.ToLowerInvariant().Contains(filter)) ||
-                (!string.IsNullOrEmpty(c.OEM) && c.OEM.ToLowerInvariant().Contains(filter)) ||
-                (!string.IsNullOrEmpty(c.City) && c.City.ToLowerInvariant().Contains(filter)) ||
-                (!string.IsNullOrEmpty(c.State) && c.State.ToLowerInvariant().Contains(filter)) ||
-                (!string.IsNullOrEmpty(c.Email) && c.Email.ToLowerInvariant().Contains(filter))
-            )
-            .ToList();
-
-        CustomerCollectionView.ItemsSource = filtered;
+        ApplyCustomerFilter();
     }
 
     private void OnCustomerSearchFocused(object sender, FocusEventArgs e)
@@ -205,10 +189,16 @@ public partial class CustomersPage : ContentPage
 
     private void CustomerSearchBar_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(e.NewTextValue))
-        {
-            CustomerCollectionView.ItemsSource = _customers;
-        }
+        // Rebuilding hundreds of variable-height cards for every keystroke is
+        // noticeably expensive on mobile. Search only on keyboard submission;
+        // clearing the field still restores the full list immediately.
+        if (_hasLoaded && string.IsNullOrWhiteSpace(e.NewTextValue))
+            ApplyCustomerFilter();
+    }
+
+    private async void OnCustomersRefreshing(object sender, EventArgs e)
+    {
+        await LoadCustomersAsync(forceRefresh: true);
     }
 }
 
@@ -240,11 +230,11 @@ public class Customer : INotifyPropertyChanged
     public string ProductVersion { get; set; } = string.Empty;
     public string Address1 { get => _address1; set => SetField(ref _address1, value); }
     public string Address2 { get => _address2; set => SetField(ref _address2, value); }
-    public string City { get => _city; set => SetField(ref _city, value); }
-    public string State { get => _state; set => SetField(ref _state, value); }
+    public string City { get => _city; set => SetLocationField(ref _city, value); }
+    public string State { get => _state; set => SetLocationField(ref _state, value); }
     public string ZipCode { get => _zip; set => SetZip(value); }
     public string Zip { get => _zip; set => SetZip(value); }
-    public string Country { get => _country; set => SetField(ref _country, value); }
+    public string Country { get => _country; set => SetLocationField(ref _country, value); }
     public string Email { get => _email; set => SetField(ref _email, value); }
     public string Phone { get => _phone; set => SetField(ref _phone, value); }
     public string ContactPerson { get => _contact; set => SetContact(value); }
@@ -262,6 +252,43 @@ public class Customer : INotifyPropertyChanged
     public double DiscountPercent { get; set; }
     public string LastOrderDataBlob { get; set; } = string.Empty;
     public int SalesBranch { get; set; }
+
+    public string DisplayName => string.IsNullOrWhiteSpace(CustomerName)
+        ? CompanyName
+        : CustomerName;
+
+    public string Initials
+    {
+        get
+        {
+            var words = DisplayName.Split(
+                ' ',
+                StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (words.Length == 0)
+                return "?";
+            if (words.Length == 1)
+                return words[0][..Math.Min(2, words[0].Length)].ToUpperInvariant();
+
+            return string.Concat(words[0][0], words[^1][0]).ToUpperInvariant();
+        }
+    }
+
+    public string CustomerSummary
+    {
+        get
+        {
+            var location = string.Join(", ", new[] { City, State }
+                .Where(value => !string.IsNullOrWhiteSpace(value)));
+            if (string.IsNullOrWhiteSpace(location))
+                location = Country;
+
+            var summary = string.Join(" · ", new[] { Contact, location }
+                .Where(value => !string.IsNullOrWhiteSpace(value)));
+            return string.IsNullOrWhiteSpace(summary) ? "Customer record" : summary;
+        }
+    }
+
+    public bool HasOem => !string.IsNullOrWhiteSpace(OEM);
 
     public Customer CreateCopy()
     {
@@ -303,6 +330,16 @@ public class Customer : INotifyPropertyChanged
         if (!SetField(ref _contact, value, nameof(Contact)))
             return;
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ContactPerson)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomerSummary)));
+    }
+
+    private void SetLocationField(
+        ref string field,
+        string value,
+        [CallerMemberName] string propertyName = null)
+    {
+        if (SetField(ref field, value, propertyName))
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomerSummary)));
     }
 
     private void SetZip(string value)

@@ -17,4 +17,27 @@ public class AppDelegate : MauiUIApplicationDelegate
         ChatNotificationService.ConfigureIosNotificationHandling();
         return base.FinishedLaunching(application, launchOptions);
     }
+
+    [Export("application:didRegisterForRemoteNotificationsWithDeviceToken:")]
+    public void RegisteredForRemoteNotifications(
+        UIApplication application,
+        NSData deviceToken)
+    {
+        var token = Convert.ToHexString(deviceToken.ToArray()).ToLowerInvariant();
+#if DEBUG
+        const string environment = "sandbox";
+#else
+        const string environment = "production";
+#endif
+        ChatPushRegistration.Publish("apns", token, environment);
+    }
+
+    [Export("application:didFailToRegisterForRemoteNotificationsWithError:")]
+    public void FailedToRegisterForRemoteNotifications(
+        UIApplication application,
+        NSError error)
+    {
+        System.Diagnostics.Debug.WriteLine(
+            $"APNs registration failed: {error.LocalizedDescription}");
+    }
 }

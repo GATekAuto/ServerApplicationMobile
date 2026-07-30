@@ -9,14 +9,15 @@
 	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <ImplicitUsings>enable</ImplicitUsings>
     <!-- Display name -->
-    <ApplicationTitle>ServerApplicationMobile</ApplicationTitle>
+    <ApplicationTitle>ATek Automation</ApplicationTitle>
     <!-- App Identifier -->
     <ApplicationId>com.ATek.ServerApplicationMobile</ApplicationId>
     <!-- Versions -->
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+    <!-- Firebase Messaging 25 requires Android 6.0/API 23 or newer. -->
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">23.0</SupportedOSPlatformVersion>
     <AndroidSdkDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android' And Exists('$(LocalAppData)\Android\Sdk')">$(LocalAppData)\Android\Sdk</AndroidSdkDirectory>
   </PropertyGroup>
   <ItemGroup>
@@ -46,13 +47,28 @@
   </ItemGroup>
   <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
     <AndroidResource Include="Platforms\Android\Resources\xml\network_security_config.xml" />
+    <GoogleServicesJson Include="Platforms\Android\google-services.json"
+                        Condition="Exists('Platforms\Android\google-services.json')" />
     <PackageReference Include="GMapUtils.Android" Version="2.0.0" />
+    <!-- 125.1.x moves its AndroidX graph to API 36/minSdk 23, which conflicts
+         with MAUI 10.0.20's Maps bindings. This release stays on the matching
+         AndroidX generation while still supporting net10.0-android. -->
+    <PackageReference Include="Xamarin.Firebase.Messaging" Version="125.0.1.2" />
+    <!-- The current bindings already ship their AARs in lib/. Suppress the
+         legacy downloader targets or .NET 10 imports every Google/Firebase AAR
+         twice and Android's manifest merger rejects the duplicate namespaces. -->
+    <PackageReference Include="Xamarin.Build.Download" Version="0.11.4"
+                      ExcludeAssets="build;buildTransitive" PrivateAssets="all" />
   </ItemGroup>
   <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' And '$(Configuration)' == 'Release'">
     <!-- WCF's serialization/callback path includes generic code that cannot always
          be fully discovered by iOS AOT. The concrete proxy avoids Reflection.Emit;
          the interpreter covers the remaining generic instantiations. -->
     <MtouchInterpreter>System.ServiceModel,System.ServiceModel.Primitives,System.ServiceModel.Duplex,System.ServiceModel.NetTcp,System.ServiceModel.NetFramingBase</MtouchInterpreter>
+    <CodesignEntitlements>Platforms\iOS\Entitlements.Release.plist</CodesignEntitlements>
+  </PropertyGroup>
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' And '$(Configuration)' != 'Release'">
+    <CodesignEntitlements>Platforms\iOS\Entitlements.Debug.plist</CodesignEntitlements>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FluentFTP" Version="54.2.0" />
@@ -67,8 +83,13 @@
   <ItemGroup>
     <Compile Include="..\..\..\ATekCommon\ATekWebCommonDBData\ATekChatCommon.cs"
              Link="Shared\ATekChatCommon.cs" />
-    <ProjectReference Include="..\..\..\ATekCommon\CADSEncryptDecryptLib\CADSEncryptDecryptLib.csproj" />
-    <ProjectReference Include="..\..\..\ATekCommon\SharedEnums\SharedEnums.csproj" />
+    <!-- These two libraries contain portable source only. Link the source into
+         the mobile app so Android and iOS restores cannot overwrite a shared
+         project.assets.json with incompatible platform target information. -->
+    <Compile Include="..\..\..\ATekCommon\CADSEncryptDecryptLib\EncryptDecrypt.cs"
+             Link="Shared\EncryptDecrypt.cs" />
+    <Compile Include="..\..\..\ATekCommon\SharedEnums\SharedEnum.cs"
+             Link="Shared\SharedEnum.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Pages\Customer Details\CustomerInfoPage.xaml.cs">

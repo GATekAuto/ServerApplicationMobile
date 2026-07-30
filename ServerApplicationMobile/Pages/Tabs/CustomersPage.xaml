@@ -1,21 +1,32 @@
-﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:ServerApplicationMobile"
              x:Class="ServerApplicationMobile.CustomersPage"
              Title="Customers">
 
-    <Grid RowSpacing="5">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <!-- SearchBar -->
-            <RowDefinition Height="Auto" />
-            <!-- Header -->
-            <RowDefinition Height="*" />
-            <!-- CollectionView -->
-        </Grid.RowDefinitions>
+    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="8">
+        <Grid Grid.Row="0"
+              Padding="16,12,16,0"
+              ColumnDefinitions="*,Auto">
+            <VerticalStackLayout Spacing="1">
+                <Label Text="Customers"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                <Label x:Name="CustomerCountLabel"
+                       Text="Loading customers…"
+                       FontSize="12"
+                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+            </VerticalStackLayout>
+        </Grid>
 
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="6">
-            <SearchBar Placeholder="Search customers"
-                       x:Name="CustomerSearchBar"
+        <Grid Grid.Row="1"
+              Padding="12,0"
+              ColumnDefinitions="*,Auto"
+              ColumnSpacing="6">
+            <SearchBar x:Name="CustomerSearchBar"
+                       Placeholder="Search name, OEM, contact, or location"
                        SearchButtonPressed="OnSearchSubmitted"
                        TextChanged="CustomerSearchBar_TextChanged"
                        Focused="OnCustomerSearchFocused"
@@ -24,7 +35,7 @@
             <Button x:Name="DismissSearchButton"
                     Grid.Column="1"
                     Text="Done"
-                    Margin="0,4,6,4"
+                    Margin="0,4,0,4"
                     Padding="12,6"
                     VerticalOptions="Fill"
                     LineBreakMode="NoWrap"
@@ -32,50 +43,164 @@
                     Clicked="OnDismissSearchClicked" />
         </Grid>
 
-        <!-- Header row -->
-        <Grid ColumnDefinitions="*,*" Padding="10"
-              BackgroundColor="{AppThemeBinding Light={StaticResource SectionBackgroundLight}, Dark={StaticResource SectionBackgroundDark}}"
-              Grid.Row="1">
-            <Label Text="Name" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-            <Label Text="OEM" FontAttributes="Bold" FontSize="12" Grid.Column="1" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+        <Grid Grid.Row="2">
+            <RefreshView x:Name="CustomerRefreshView"
+                         Refreshing="OnCustomersRefreshing">
+                <CollectionView x:Name="CustomerCollectionView"
+                                Margin="0"
+                                SelectionMode="None"
+                                ItemSizingStrategy="MeasureAllItems"
+                                Scrolled="OnCustomerListScrolled">
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Padding="32,56"
+                                             Spacing="8"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="Center">
+                            <Label Text="&#xf0c0;"
+                                   FontFamily="FontAwesome"
+                                   FontSize="32"
+                                   HorizontalTextAlignment="Center"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                            <Label x:Name="EmptyTitleLabel"
+                                   Text="No customers found"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                            <Label x:Name="EmptyDetailLabel"
+                                   Text="Pull down to try loading the customer list again."
+                                   FontSize="12"
+                                   HorizontalTextAlignment="Center"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="local:Customer">
+                            <Border Margin="12,4"
+                                    Padding="12"
+                                    Stroke="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
+                                    StrokeThickness="1"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="12" />
+                                </Border.StrokeShape>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnCustomerTapped"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="48,*,Auto"
+                                      RowDefinitions="Auto,Auto"
+                                      ColumnSpacing="12"
+                                      RowSpacing="7">
+                                    <Border Grid.RowSpan="2"
+                                            WidthRequest="44"
+                                            HeightRequest="44"
+                                            Padding="0"
+                                            HorizontalOptions="Center"
+                                            VerticalOptions="Start"
+                                            Stroke="Transparent"
+                                            BackgroundColor="{StaticResource Primary}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="22" />
+                                        </Border.StrokeShape>
+                                        <Label Text="{Binding Initials}"
+                                               FontSize="14"
+                                               FontAttributes="Bold"
+                                               TextColor="White"
+                                               HorizontalTextAlignment="Center"
+                                               VerticalTextAlignment="Center" />
+                                    </Border>
+
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Grid.ColumnSpan="2"
+                                                         Spacing="2">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                            <Label Text="{Binding DisplayName}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"
+                                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                                            <Label Grid.Column="1"
+                                                   Text="›"
+                                                   FontSize="22"
+                                                   VerticalTextAlignment="Center"
+                                                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                                        </Grid>
+                                        <Label Text="{Binding CustomerSummary}"
+                                               FontSize="12"
+                                               LineBreakMode="TailTruncation"
+                                               TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                                    </VerticalStackLayout>
+
+                                    <FlexLayout Grid.Row="1"
+                                                Grid.Column="1"
+                                                Grid.ColumnSpan="2"
+                                                Direction="Row"
+                                                Wrap="Wrap"
+                                                AlignItems="Center">
+                                        <Border Margin="0,0,6,2"
+                                                Padding="8,3"
+                                                IsVisible="{Binding HasOem}"
+                                                Stroke="Transparent"
+                                                BackgroundColor="{AppThemeBinding Light={StaticResource SectionBackgroundLight}, Dark={StaticResource SectionBackgroundDark}}">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="9" />
+                                            </Border.StrokeShape>
+                                            <Label Text="{Binding OEM}"
+                                                   FontSize="10"
+                                                   FontAttributes="Bold"
+                                                   LineBreakMode="TailTruncation"
+                                                   TextColor="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+                                        </Border>
+
+                                        <Border Margin="0,0,6,2"
+                                                Padding="8,3"
+                                                IsVisible="{Binding HasMaintenancePackage}"
+                                                Stroke="Transparent"
+                                                BackgroundColor="{AppThemeBinding Light=#DDF5E6, Dark=#163D2A}">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="9" />
+                                            </Border.StrokeShape>
+                                            <Label Text="Maintenance"
+                                                   FontSize="10"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{AppThemeBinding Light={StaticResource SuccessLight}, Dark={StaticResource SuccessDark}}" />
+                                        </Border>
+
+                                        <Border Margin="0,0,6,2"
+                                                Padding="8,3"
+                                                IsVisible="{Binding IsInactive}"
+                                                Stroke="Transparent"
+                                                BackgroundColor="{AppThemeBinding Light=#FDE7E5, Dark=#4A1F1B}">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="9" />
+                                            </Border.StrokeShape>
+                                            <Label Text="Inactive"
+                                                   FontSize="10"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{AppThemeBinding Light={StaticResource DangerLight}, Dark={StaticResource DangerDark}}" />
+                                        </Border>
+                                    </FlexLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+
+            <VerticalStackLayout x:Name="LoadingState"
+                                 IsVisible="False"
+                                 Spacing="10"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center">
+                <ActivityIndicator x:Name="LoadingIndicator"
+                                   IsRunning="False" />
+                <Label Text="Loading customers…"
+                       FontSize="12"
+                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+            </VerticalStackLayout>
         </Grid>
-
-        <!-- Data list -->
-        <CollectionView x:Name="CustomerCollectionView"
-                        Margin="0"
-                        SelectionMode="None"
-                        Scrolled="OnCustomerListScrolled"
-                        Grid.Row="2">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Border Stroke="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
-                StrokeThickness="1"
-                BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}"
-                Padding="5"
-                Margin="5">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="6" />
-                        </Border.StrokeShape>
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnCustomerTapped"
-                                                  CommandParameter="{Binding .}" />
-                        </Border.GestureRecognizers>
-
-                        <Grid ColumnDefinitions="*,*"
-                  Padding="10"
-                  VerticalOptions="Center"
-                  HorizontalOptions="Fill">
-                            <Label Text="{Binding CustomerName}" FontSize="11" Grid.Column="0"
-                       HorizontalTextAlignment="Center" VerticalOptions="Center" LineBreakMode="NoWrap" />
-                            <Label Text="{Binding OEM}" FontSize="11" Grid.Column="1"
-                       HorizontalTextAlignment="Center" VerticalOptions="Center" LineBreakMode="NoWrap" />
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-
-
-
-        </CollectionView>
     </Grid>
 </ContentPage>

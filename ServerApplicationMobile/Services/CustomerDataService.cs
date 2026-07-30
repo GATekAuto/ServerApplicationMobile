@@ -23,6 +23,15 @@ public sealed class CustomerDataService
         }
     }
 
+    public Task<IReadOnlyList<Customer>> RefreshCustomersAsync()
+    {
+        lock (_sync)
+        {
+            _loadTask = LoadCustomersAsync();
+            return _loadTask;
+        }
+    }
+
     public void StartLoading()
     {
         _ = ObserveStartupLoadAsync(GetCustomersAsync());

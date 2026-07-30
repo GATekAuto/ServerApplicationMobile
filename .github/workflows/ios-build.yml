@@ -48,8 +48,8 @@ jobs:
     timeout-minutes: 45
 
     steps:
-      # The paths below reproduce the source-tree layout used by the existing
-      # ProjectReference entries in ServerApplicationMobile.csproj.
+      # The paths below reproduce the source-tree layout used by the linked
+      # common source files in ServerApplicationMobile.csproj.
       - name: Check out the mobile app
         uses: actions/checkout@v7
         with:
@@ -78,10 +78,10 @@ jobs:
           dotnet --info
           xcodebuild -version
 
-      - name: Restore shared projects
+      - name: Verify ATekCommon shared sources
         run: |
-          dotnet restore "$COMMON_ROOT/SharedEnums/SharedEnums.csproj" -p:TargetFramework=net8.0
-          dotnet restore "$COMMON_ROOT/CADSEncryptDecryptLib/CADSEncryptDecryptLib.csproj" -p:TargetFramework=net8.0
+          test -f "$COMMON_ROOT/SharedEnums/SharedEnum.cs"
+          test -f "$COMMON_ROOT/CADSEncryptDecryptLib/EncryptDecrypt.cs"
 
       - name: Restore iOS Simulator dependencies
         run: >-
@@ -152,10 +152,10 @@ jobs:
           dotnet --info
           xcodebuild -version
 
-      - name: Restore shared projects
+      - name: Verify ATekCommon shared sources
         run: |
-          dotnet restore "$COMMON_ROOT/SharedEnums/SharedEnums.csproj" -p:TargetFramework=net8.0
-          dotnet restore "$COMMON_ROOT/CADSEncryptDecryptLib/CADSEncryptDecryptLib.csproj" -p:TargetFramework=net8.0
+          test -f "$COMMON_ROOT/SharedEnums/SharedEnum.cs"
+          test -f "$COMMON_ROOT/CADSEncryptDecryptLib/EncryptDecrypt.cs"
 
       - name: Restore iOS device dependencies
         run: >-
@@ -274,6 +274,12 @@ jobs:
           security cms -D -i "$profile_path" > "$profile_plist"
           profile_uuid="$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$profile_plist")"
           profile_name="$(/usr/libexec/PlistBuddy -c 'Print :Name' "$profile_plist")"
+          aps_environment="$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:aps-environment' "$profile_plist" 2>/dev/null || true)"
+          if [[ -z "$aps_environment" ]]; then
+            echo "::error::The provisioning profile does not include the Push Notifications capability. Enable it for com.ATek.ServerApplicationMobile and regenerate the profile."
+            exit 1
+          fi
+          echo "Provisioning profile APNs environment: $aps_environment"
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
           cp "$profile_path" "$HOME/Library/MobileDevice/Provisioning Profiles/$profile_uuid.mobileprovision"
 
@@ -288,10 +294,10 @@ jobs:
           echo "keychain_path=$keychain_path" >> "$GITHUB_OUTPUT"
           echo "profile_uuid=$profile_uuid" >> "$GITHUB_OUTPUT"
 
-      - name: Restore shared projects
+      - name: Verify ATekCommon shared sources
         run: |
-          dotnet restore "$COMMON_ROOT/SharedEnums/SharedEnums.csproj" -p:TargetFramework=net8.0
-          dotnet restore "$COMMON_ROOT/CADSEncryptDecryptLib/CADSEncryptDecryptLib.csproj" -p:TargetFramework=net8.0
+          test -f "$COMMON_ROOT/SharedEnums/SharedEnum.cs"
+          test -f "$COMMON_ROOT/CADSEncryptDecryptLib/EncryptDecrypt.cs"
 
       - name: Restore iOS device dependencies
         run: >-

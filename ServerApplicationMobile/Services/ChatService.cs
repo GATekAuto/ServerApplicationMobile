@@ -42,6 +42,7 @@ public sealed class ChatService : INotifyPropertyChanged
     public ChatService(AuthenticationService authenticationService)
     {
         _authenticationService = authenticationService;
+        ChatPushRegistration.TokenChanged += OnPushTokenChanged;
         AddUniversalServiceTechSession();
     }
 
@@ -159,6 +160,7 @@ public sealed class ChatService : INotifyPropertyChanged
 
             SetStatus("Connected", string.Empty);
             StartWatchdog();
+            _ = UpdatePushRegistrationAsync();
             return true;
         }
         catch (Exception ex)
@@ -435,6 +437,43 @@ public sealed class ChatService : INotifyPropertyChanged
         }
     }
 
+    private void OnPushTokenChanged(ChatPushToken registration)
+    {
+        if (_authenticationService.IsAuthenticated)
+            _ = UpdatePushRegistrationAsync();
+    }
+
+    private async Task UpdatePushRegistrationAsync()
+    {
+        var identity = CreateIdentityCredential();
+        if (identity == null || string.IsNullOrWhiteSpace(identity.MobilePushToken))
+            return;
+
+        await _operationGate.WaitAsync();
+        try
+        {
+            var channel = _channel;
+            if (channel is not ICommunicationObject communicationObject ||
+                communicationObject.State != CommunicationState.Opened)
+            {
+                return;
+            }
+
+            await Task.Run(() => channel.ServiceTechWatchDog(
+                GenerateToken(),
+                Serialize(identity)));
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(
+                $"Push token registration will retry on the next chat connection: {ex.Message}");
+        }
+        finally
+        {
+            _operationGate.Release();
+        }
+    }
+
     private void OnChannelUnavailable(object sender, EventArgs e)
     {
         SetStatus("Disconnected", "The chat server connection was lost. Reconnecting...");
@@ -488,13 +527,13 @@ public sealed class ChatService : INotifyPropertyChanged
         };
     }
 
-    private CATekClientCredential CreateIdentityCredential()
+    private MobileChatCredential CreateIdentityCredential()
     {
         var user = _authenticationService.CurrentUser;
         if (user == null)
             return null;
 
-        return new CATekClientCredential
+        var identity = new MobileChatCredential
         {
             IsJob = false,
             OEM = user.OEMName,
@@ -502,6 +541,17 @@ public sealed class ChatService : INotifyPropertyChanged
             UserID = user.UserID,
             ServiceTechDisplayName = CurrentUserName
         };
+
+        var push = ChatPushRegistration.Current;
+        if (push != null)
+        {
+            identity.MobilePushPlatform = push.Platform;
+            identity.MobilePushToken = push.Token;
+            identity.MobilePushInstallationId = push.InstallationId;
+            identity.MobilePushEnvironment = push.Environment;
+        }
+
+        return identity;
     }
 
     private void HandleNewChat(string credentialJson, string messageJson)
