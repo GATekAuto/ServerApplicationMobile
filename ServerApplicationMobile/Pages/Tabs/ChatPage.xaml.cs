@@ -58,6 +58,22 @@ public partial class ChatPage : ContentPage
             ScrollMessagesToEnd();
         }
     }
+    private void UpdateConnectionState()
+    {
+        var connected = string.Equals( _chatService.ConnectionStatus?.Trim(), "Connected", StringComparison.OrdinalIgnoreCase);
+
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            btnServiceTech.IsEnabled = connected;
+            btnReconnect.IsEnabled = connected;
+
+            RaisePropertyChanged(nameof(ConnectionStatus));
+            RaisePropertyChanged(nameof(LastError));
+
+            UpdateComposerState();
+        });
+    }
+
 
     protected override async void OnAppearing()
     {
@@ -72,13 +88,13 @@ public partial class ChatPage : ContentPage
 
         CloseConversationIfRemoved();
 
-        RaiseConnectionProperties();
+        UpdateConnectionState();
         RaisePropertyChanged(nameof(ServiceTechsButtonText));
+
         await _chatService.ConnectAsync();
-        RaiseConnectionProperties();
 
+        UpdateConnectionState();
     }
-
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
@@ -204,7 +220,6 @@ public partial class ChatPage : ContentPage
     {
         await Navigation.PushAsync(new ServiceTechsPage(_chatService));
     }
-
     public async Task OpenServiceTechChatAsync(ServiceTechSession session)
     {
         if (session == null || !_chatService.ServiceTechs.Contains(session))
@@ -213,19 +228,22 @@ public partial class ChatPage : ContentPage
         await Navigation.PushAsync(new ServiceTechConversationPage(_chatService, session));
     }
 
-    private void OnChatServicePropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void OnChatServicePropertyChanged(
+        object sender,
+        PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ChatService.ConnectionStatus) ||
             e.PropertyName == nameof(ChatService.LastError))
         {
-            RaiseConnectionProperties();
-            UpdateComposerState();
+            UpdateConnectionState();
         }
 
         if (e.PropertyName == nameof(ChatService.ServiceTechUnreadCount))
-            RaisePropertyChanged(nameof(ServiceTechsButtonText));
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+                RaisePropertyChanged(nameof(ServiceTechsButtonText)));
+        }
     }
-
     private void OnSelectedChatPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         RaisePropertyChanged(nameof(SelectedChat));

@@ -121,13 +121,13 @@ public partial class AppTabbedPage
 
         var loggedInLabel = new Label
         {
-            Text = $"Logged in as: {serviceTechName}",
+            Text = $"{serviceTechName}",
             FontSize = 10,
             TextColor = Colors.White,
             Opacity = 0.82,
             HorizontalTextAlignment = TextAlignment.End,
             VerticalTextAlignment = TextAlignment.Center,
-            LineBreakMode = LineBreakMode.TailTruncation,
+            LineBreakMode = LineBreakMode.WordWrap,
             MaximumWidthRequest = 190
         };
 

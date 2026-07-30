@@ -15,17 +15,54 @@
                BorderColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
                BackgroundColor="{AppThemeBinding Light={StaticResource CardBackgroundLight}, Dark={StaticResource CardBackgroundDark}}">
             <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="8">
-                <Label Text="{Binding ConnectionStatus}"
-                       FontAttributes="Bold"
-                       VerticalTextAlignment="Center"
-                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}" />
+                <HorizontalStackLayout Grid.Row="1"
+                       Spacing="6"
+                       VerticalOptions="Center">
+
+                    <Label Text="{Binding ConnectionStatus}"
+           FontSize="12"
+           FontAttributes="Bold"
+           VerticalTextAlignment="Center"
+           TextColor="{AppThemeBinding
+               Light={StaticResource TextPrimaryLight},
+               Dark={StaticResource TextPrimaryDark}}">
+
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label"
+                         Binding="{Binding ConnectionStatus}"
+                         Value="Connected">
+                                <Setter Property="TextColor" Value="Green" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                    <ActivityIndicator WidthRequest="16"
+                       HeightRequest="16"
+                       Color="{AppThemeBinding
+                           Light={StaticResource AccentLight},
+                           Dark={StaticResource AccentDark}}"
+                       IsVisible="False"
+                       IsRunning="False">
+
+                        <ActivityIndicator.Triggers>
+                            <DataTrigger TargetType="ActivityIndicator"
+                         Binding="{Binding ConnectionStatus}"
+                         Value="Connecting">
+                                <Setter Property="IsVisible" Value="True" />
+                                <Setter Property="IsRunning" Value="True" />
+                            </DataTrigger>
+                        </ActivityIndicator.Triggers>
+                    </ActivityIndicator>
+
+                </HorizontalStackLayout>
                 <Button Grid.Column="1"
                         Grid.RowSpan="2"
+                        x:Name="btnServiceTech"
                         Text="{Binding ServiceTechsButtonText}"
                         Padding="12,4"
                         Clicked="OnServiceTechsClicked" />
                 <Button Grid.Column="2"
                         Grid.RowSpan="2"
+                        x:Name="btnReconnect"
                         Text="Reconnect"
                         Padding="12,4"
                         Clicked="OnReconnectClicked" />
@@ -57,11 +94,31 @@
                     <CollectionView.EmptyView>
                         <Grid HorizontalOptions="Fill"
                               Padding="12,24">
-                            <Label Text="No active customer chats."
-                                   HorizontalOptions="Fill"
-                                   HorizontalTextAlignment="Center"
-                                   LineBreakMode="NoWrap"
-                                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}" />
+                            <Grid HorizontalOptions="Fill" Padding="12,24">
+
+                                <HorizontalStackLayout HorizontalOptions="Center" Spacing="8" IsVisible="False">
+                                    <HorizontalStackLayout.Triggers>
+                                        <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding ConnectionStatus}" Value="Connecting">
+                                            <Setter Property="IsVisible" Value="True" />
+                                        </DataTrigger>
+                                    </HorizontalStackLayout.Triggers>
+
+                                    <ActivityIndicator IsRunning="True"
+                           Color="{AppThemeBinding Light={StaticResource AccentLight}, Dark={StaticResource AccentDark}}" />
+
+                                </HorizontalStackLayout>
+
+                                <Label Text="No active customer chats." HorizontalOptions="Fill"
+           HorizontalTextAlignment="Center" LineBreakMode="NoWrap" IsVisible="False"
+           TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding ConnectionStatus}" Value="Connected">
+                                            <Setter Property="IsVisible" Value="True" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+
+                            </Grid>
                         </Grid>
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>

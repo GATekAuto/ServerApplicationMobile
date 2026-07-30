@@ -83,12 +83,6 @@ public sealed class ChatService : INotifyPropertyChanged
 
     public void StartConnecting()
     {
-        if (!_authenticationService.IsAuthenticated)
-        {
-            SetStatus("Signed out", "Sign in before connecting to chat.");
-            return;
-        }
-
         _ = ObserveConnectionAsync();
     }
 
@@ -100,7 +94,6 @@ public sealed class ChatService : INotifyPropertyChanged
             var identity = CreateIdentityCredential();
             if (identity == null)
             {
-                SetStatus("Signed out", "Sign in before connecting to chat.");
                 return false;
             }
 
@@ -110,7 +103,7 @@ public sealed class ChatService : INotifyPropertyChanged
                 return true;
             }
 
-            SetStatus("Connecting...", string.Empty);
+            SetStatus("Connecting", string.Empty);
             AbortChannel();
 
             var identityJson = Serialize(identity);
@@ -166,7 +159,7 @@ public sealed class ChatService : INotifyPropertyChanged
         catch (Exception ex)
         {
             AbortChannel();
-            SetStatus("Disconnected", FriendlyError(ex));
+            SetStatus("Disconnected", string.Empty);
             return false;
         }
         finally
@@ -213,7 +206,7 @@ public sealed class ChatService : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            SetStatus(ConnectionStatus, FriendlyError(ex));
+            SetStatus("Server Failed", string.Empty);
             System.Diagnostics.Debug.WriteLine($"Joining chat failed: {ex}");
             return false;
         }
@@ -361,7 +354,7 @@ public sealed class ChatService : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            SetStatus("Disconnected", FriendlyError(ex));
+            SetStatus("Disconnected", string.Empty);
         }
     }
 
@@ -385,7 +378,7 @@ public sealed class ChatService : INotifyPropertyChanged
         catch (Exception ex)
         {
             AbortChannel();
-            SetStatus("Disconnected", FriendlyError(ex));
+            SetStatus("Disconnected", string.Empty);
             return false;
         }
         finally
@@ -476,7 +469,7 @@ public sealed class ChatService : INotifyPropertyChanged
 
     private void OnChannelUnavailable(object sender, EventArgs e)
     {
-        SetStatus("Disconnected", "The chat server connection was lost. Reconnecting...");
+        SetStatus("Disconnected", "Reconnecting...");
         _ = ReconnectAfterDelayAsync();
     }
 
